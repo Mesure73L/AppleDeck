@@ -1,0 +1,23 @@
+{
+  "name": "appledeck-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mesure73L/AppleDeck.git"
+  },
+  "author": "Mesure73L",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/Mesure73L/AppleDeck/issues"
+  },
+  "homepage": "https://github.com/Mesure73L/AppleDeck#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.1",
+    "socket.io": "^4.8.0"
+  }
+}

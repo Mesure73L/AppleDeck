@@ -46,30 +46,18 @@ function out(message) {
     history.push(message);
 }
 
+// JOIN
+
 function jout(message) {
     out(joinPrefix + message);
 }
 
-function uout(message) {
-    out(userPrefix + message);
-}
-
-function hout(message) {
-    out(hostPrefix + message);
-}
-
-function sout(message) {
-    out(specPrefix + message);
-}
-
-function nout(message) {
-    out(nodePrefix + message);
-}
-
-// JOIN
-
 joinApp.get("/", (req, res) => {
     res.sendFile(dir + "/join.html");
+});
+
+joinApp.get("/logo", (req, res) => {
+    res.sendFile(dir + "/logo.png");
 });
 
 join.on("connect", socket => {
@@ -82,8 +70,16 @@ join.on("connect", socket => {
 
 // USER
 
+function uout(message) {
+    out(userPrefix + message);
+}
+
 userApp.get("/", (req, res) => {
     res.sendFile(dir + "/user.html");
+});
+
+userApp.get("/logo", (req, res) => {
+    res.sendFile(dir + "/logo.png");
 });
 
 user.on("connection", socket => {
@@ -96,8 +92,16 @@ user.on("connection", socket => {
 
 // HOST
 
+function hout(message) {
+    out(hostPrefix + message);
+}
+
 hostApp.get("/", (req, res) => {
     res.sendFile(dir + "/host.html");
+});
+
+hostApp.get("/logo", (req, res) => {
+    res.sendFile(dir + "/logo.png");
 });
 
 host.on("connect", socket => {
@@ -110,8 +114,16 @@ host.on("connect", socket => {
 
 // SPEC
 
+function sout(message) {
+    out(specPrefix + message);
+}
+
 specApp.get("/", (req, res) => {
     res.sendFile(dir + "/spec.html");
+});
+
+specApp.get("/logo", (req, res) => {
+    res.sendFile(dir + "/logo.png");
 });
 
 spec.on("connect", socket => {
@@ -124,8 +136,16 @@ spec.on("connect", socket => {
 
 // NODE
 
+function nout(message) {
+    out(nodePrefix + message);
+}
+
 nodeApp.get("/", (req, res) => {
     res.sendFile(dir + "/node.html");
+});
+
+nodeApp.get("/logo", (req, res) => {
+    res.sendFile(dir + "/logo.png");
 });
 
 node.on("connect", socket => {

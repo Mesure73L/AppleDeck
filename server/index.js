@@ -73,7 +73,7 @@ joinApp.get("/logo", (req, res) => {
     res.sendFile(dir + "/logo.png");
 });
 
-join.on("connect", socket => {
+join.on("connect", (socket) => {
     jout("client connected");
 
     socket.on("disconnect", () => {
@@ -129,7 +129,7 @@ userApp.get("/logo", (req, res) => {
     res.sendFile(dir + "/logo.png");
 });
 
-user.on("connection", socket => {
+user.on("connection", (socket) => {
     uout("client connected");
 
     socket.on("disconnect", () => {
@@ -151,7 +151,7 @@ hostApp.get("/logo", (req, res) => {
     res.sendFile(dir + "/logo.png");
 });
 
-host.on("connect", socket => {
+host.on("connect", (socket) => {
     hout("client connected");
 
     socket.on("disconnect", () => {
@@ -173,7 +173,7 @@ specApp.get("/logo", (req, res) => {
     res.sendFile(dir + "/logo.png");
 });
 
-spec.on("connect", socket => {
+spec.on("connect", (socket) => {
     sout("client connected");
 
     socket.on("disconnect", () => {
@@ -195,7 +195,7 @@ nodeApp.get("/logo", (req, res) => {
     res.sendFile(dir + "/logo.png");
 });
 
-node.on("connect", socket => {
+node.on("connect", (socket) => {
     nout("client connected");
 
     socket.on("disconnect", () => {

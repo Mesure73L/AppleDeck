@@ -7,9 +7,41 @@
         <link rel="icon" type="image/x-png" href="logo" />
     </head>
     <body>
+        <form id="form">
+            <label for="username">Choose a nickname:</label>
+            <input id="username" name="username" maxlength="25" />
+            <button id="submit" name="submit" type="submit">Go!</button>
+        </form>
+
         <script src="/socket.io/socket.io.js"></script>
         <script>
             let socket = io();
+
+            const form = document.getElementById("form");
+            const usernameInput = document.getElementById("username");
+
+            let username;
+
+            form.addEventListener("submit", e => {
+                e.preventDefault();
+
+                socket.emit("New User", usernameInput.value);
+                username = usernameInput.value;
+            });
+
+            socket.on("User Approval", (approval) => {
+                try {
+                    if (approval.username == username) {
+                        if (approval.permission) {
+                            alert("Approved! Token: " + approval.token);
+                        } else {
+                            alert("Disapproved. Reason: " + approval.reason);
+                        }
+                    }
+                } catch (e) {
+                    alert(e);
+                }
+            });
         </script>
     </body>
 </html>

@@ -15,7 +15,7 @@ const hostNamespace = "/host";
 const specNamespace = "/spec";
 const nodeNamespace = "/node";
 
-const tokenLength = 3;
+const tokenLength = 5;
 
 // SETUP SERVERS
 
@@ -51,6 +51,9 @@ function generateToken() {
 
     for (let i = 0; i < tokenLength; i++) {
         token += Math.random().toString(36);
+        if (i != tokenLength - 1) {
+            token += "-";
+        }
     }
 
     return token.replaceAll("0.", "");
@@ -76,7 +79,7 @@ app.get("/", (req, res) => {
     res.sendFile(dir + "/join.html");
 });
 
-join.on("connect", (socket) => {
+join.on("connect", socket => {
     jout("client connected");
 
     socket.on("disconnect", () => {
@@ -85,7 +88,9 @@ join.on("connect", (socket) => {
 
     // ---
 
-    socket.on("New User", username => {
+    socket.on("New User", fullUsername => {
+        const username = fullUsername.trim();
+
         jout(username + " is requesting to join");
 
         if (connected.includes(username)) {
@@ -93,6 +98,14 @@ join.on("connect", (socket) => {
                 username: username,
                 permission: false,
                 reason: "Nickname is already in use!"
+            });
+        }
+
+        if (username == "" || username == undefined) {
+            return join.emit("User Approval", {
+                username: username,
+                permission: false,
+                reason: "Nickname cannot be blank!"
             });
         }
 

@@ -65,6 +65,93 @@
                 background-color: #ffffff;
                 color: #9e49c8;
             }
+
+            #error {
+                font-family: Roboto, Arial, sans-serif;
+                font-size: 20px;
+                text-align: center;
+                color: #f96f5d;
+                margin-top: 10px;
+                display: none;
+            }
+
+            .loading-animation-container {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                display: none;
+            }
+
+            .lds-ellipsis {
+                display: inline-block;
+                position: relative;
+                width: 160px;
+                height: 100px;
+            }
+
+            .lds-ellipsis div {
+                position: absolute;
+                bottom: 14px;
+                width: 26px;
+                height: 26px;
+                border-radius: 50%;
+                background: #9e49c8;
+                animation-timing-function: cubic-bezier(0, 1, 1, 0);
+            }
+
+            .lds-ellipsis div:nth-child(1) {
+                left: 16px;
+                animation: lds-ellipsis1 0.6s infinite;
+            }
+
+            .lds-ellipsis div:nth-child(2) {
+                left: 16px;
+                animation: lds-ellipsis2 0.6s infinite;
+            }
+
+            .lds-ellipsis div:nth-child(3) {
+                left: 64px;
+                animation: lds-ellipsis2 0.6s infinite;
+            }
+
+            .lds-ellipsis div:nth-child(4) {
+                left: 112px;
+                animation: lds-ellipsis3 0.6s infinite;
+            }
+
+            @keyframes lds-ellipsis1 {
+                0% {
+                    transform: scale(0);
+                }
+
+                100% {
+                    transform: scale(1);
+                }
+            }
+
+            @keyframes lds-ellipsis3 {
+                0% {
+                    transform: scale(1);
+                }
+
+                100% {
+                    transform: scale(0);
+                }
+            }
+
+            @keyframes lds-ellipsis2 {
+                0% {
+                    transform: translate(0, 0);
+                }
+
+                100% {
+                    transform: translate(48px, 0);
+                }
+            }
         </style>
     </head>
     <body>
@@ -72,7 +159,17 @@
             <label id="label" for="username">Choose a nickname:</label>
             <input id="username" name="username" maxlength="25" />
             <button id="submit" name="submit" type="submit">Go!</button>
+            <p id="error"></p>
         </form>
+
+        <div class="loading-animation-container" id="loading">
+            <div class="lds-ellipsis">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
 
         <script src="/socket.io/socket.io.js"></script>
         <script>
@@ -88,19 +185,21 @@
 
                 socket.emit("New User", usernameInput.value);
                 username = usernameInput.value;
+
+                document.getElementById("form").style.display = "none";
+                document.getElementById("loading").style.display = "flex";
             });
 
             socket.on("User Approval", approval => {
-                try {
-                    if (approval.username == username) {
-                        if (approval.permission) {
-                            window.location.href += "user";
-                        } else {
-                            alert("Disapproved. Reason: " + approval.reason);
-                        }
+                if (approval.username == username) {
+                    if (approval.permission) {
+                        window.location.href += "user";
+                    } else {
+                        document.getElementById("error").innerText = approval.reason;
+                        document.getElementById("error").style.display = "block";
+                        document.getElementById("loading").style.display = "none";
+                        document.getElementById("form").style.display = "block";
                     }
-                } catch (e) {
-                    alert(e);
                 }
             });
         </script>

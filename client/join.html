@@ -183,24 +183,22 @@
             form.addEventListener("submit", e => {
                 e.preventDefault();
 
-                socket.emit("New User", usernameInput.value);
+                usernameInput.value = usernameInput.value.trim();
+
+                socket.emit("new user", usernameInput.value);
                 username = usernameInput.value;
 
                 document.getElementById("form").style.display = "none";
                 document.getElementById("loading").style.display = "flex";
             });
 
-            socket.on("User Approval", approval => {
-                if (approval.username == username) {
-                    if (approval.permission) {
-                        window.location.href += "user";
-                    } else {
-                        document.getElementById("error").innerText = approval.reason;
-                        document.getElementById("error").style.display = "block";
-                        document.getElementById("loading").style.display = "none";
-                        document.getElementById("form").style.display = "block";
-                    }
-                }
+            socket.on("user approval", approval => {
+                if (approval.permission) return (window.location.href += "user");
+
+                document.getElementById("error").innerText = approval.reason;
+                document.getElementById("error").style.display = "block";
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("form").style.display = "block";
             });
         </script>
     </body>

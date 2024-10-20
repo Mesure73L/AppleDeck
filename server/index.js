@@ -90,15 +90,12 @@ join.on("connect", socket => {
 
     // ---
 
-    socket.on("New User", fullUsername => {
-        const username = fullUsername.trim();
-
+    socket.on("new user", username => {
         jout(username + " is requesting to join");
 
         if (connected.includes(username)) {
             jout(username + " was denied: name in use");
-            return join.emit("User Approval", {
-                username: username,
+            return socket.emit("user approval", {
                 permission: false,
                 reason: "Nickname is already in use!"
             });
@@ -106,8 +103,7 @@ join.on("connect", socket => {
 
         if (username == "" || username == undefined) {
             jout(username + " was denied: name is blank");
-            return join.emit("User Approval", {
-                username: username,
+            return socket.emit("user approval", {
                 permission: false,
                 reason: "Nickname cannot be blank!"
             });
@@ -115,8 +111,7 @@ join.on("connect", socket => {
 
         if (banned.includes(username)) {
             jout(username + " was denied: name is banned");
-            return join.emit("User Approval", {
-                username: username,
+            return socket.emit("user approval", {
                 permission: false,
                 reason: "Nickname is banned!"
             });
@@ -124,8 +119,7 @@ join.on("connect", socket => {
 
         if (profanity.exists(username)) {
             jout(username + " was denied: name contains profanity");
-            return join.emit("User Approval", {
-                username: username,
+            return socket.emit("user approval", {
                 permission: false,
                 reason: "Nickname cannot contain profanity!"
             });
@@ -137,8 +131,7 @@ join.on("connect", socket => {
         connected.push(username);
         userTokens.push({username: username, token: token});
 
-        join.emit("User Approval", {
-            username: username,
+        socket.emit("user approval", {
             permission: true,
             token: token
         });
@@ -205,7 +198,6 @@ spec.on("connect", socket => {
     // ---
 });
 
-
 // NODE
 
 function nout(message) {
@@ -225,7 +217,6 @@ node.on("connect", socket => {
 
     // ---
 });
-
 
 // START SERVERS
 

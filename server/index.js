@@ -36,6 +36,8 @@ const node = io.of(nodeNamespace);
 
 // OTHER SETUP
 
+const {profanity, CensorType} = require("@2toad/profanity");
+
 let connected = [];
 let userTokens = [];
 let banned = [];
@@ -94,6 +96,7 @@ join.on("connect", socket => {
         jout(username + " is requesting to join");
 
         if (connected.includes(username)) {
+            jout(username + " was denied: name in use");
             return join.emit("User Approval", {
                 username: username,
                 permission: false,
@@ -102,6 +105,7 @@ join.on("connect", socket => {
         }
 
         if (username == "" || username == undefined) {
+            jout(username + " was denied: name is blank");
             return join.emit("User Approval", {
                 username: username,
                 permission: false,
@@ -110,10 +114,20 @@ join.on("connect", socket => {
         }
 
         if (banned.includes(username)) {
+            jout(username + " was denied: name is banned");
             return join.emit("User Approval", {
                 username: username,
                 permission: false,
                 reason: "Nickname is banned!"
+            });
+        }
+
+        if (profanity.exists(username)) {
+            jout(username + " was denied: name contains profanity");
+            return join.emit("User Approval", {
+                username: username,
+                permission: false,
+                reason: "Nickname cannot contain profanity!"
             });
         }
 

@@ -17,6 +17,7 @@
   "homepage": "https://github.com/Mesure73L/AppleDeck#readme",
   "description": "",
   "dependencies": {
+    "@2toad/profanity": "^3.0.0",
     "express": "^4.21.1",
     "socket.io": "^4.8.0"
   }

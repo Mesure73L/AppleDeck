@@ -155,6 +155,16 @@ app.get("/user", (req, res) => {
     res.sendFile(dir + "/user.html");
 });
 
+user.on("connect", socket => {
+    uout("client connected");
+
+    socket.on("disconnect", () => {
+        uout("client disconnected");
+    });
+
+    // ---
+});
+
 // HOST
 
 function hout(message) {
@@ -163,6 +173,16 @@ function hout(message) {
 
 app.get("/host", (req, res) => {
     res.sendFile(dir + "/host.html");
+});
+
+host.on("connect", socket => {
+    hout("client connected");
+
+    socket.on("disconnect", () => {
+        hout("client disconnected");
+    });
+
+    // ---
 });
 
 // SPEC
@@ -175,6 +195,17 @@ app.get("/spec", (req, res) => {
     res.sendFile(dir + "/spec.html");
 });
 
+spec.on("connect", socket => {
+    sout("client connected");
+
+    socket.on("disconnect", () => {
+        sout("client disconnected");
+    });
+
+    // ---
+});
+
+
 // NODE
 
 function nout(message) {
@@ -184,6 +215,17 @@ function nout(message) {
 app.get("/node", (req, res) => {
     res.sendFile(dir + "/node.html");
 });
+
+node.on("connect", socket => {
+    nout("client connected");
+
+    socket.on("disconnect", () => {
+        nout("client disconnected");
+    });
+
+    // ---
+});
+
 
 // START SERVERS
 

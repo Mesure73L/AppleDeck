@@ -216,6 +216,8 @@ node.on("connect", socket => {
     });
 
     // ---
+
+    socket.emit("history", history);
 });
 
 // START SERVERS

@@ -31,6 +31,12 @@
                 padding: 0;
             }
 
+            #output {
+                height: calc(100% - 30px);
+                position: relative;
+                top: 0;
+            }
+
             .cmd {
                 color: #66cc00;
             }
@@ -45,6 +51,30 @@
 
             .prompt {
                 color: #999;
+            }
+
+            .clnt {
+                color: #00ffff;
+            }
+
+            .join {
+                color: #00bc00;
+            }
+
+            .user {
+                color: #00c3ff;
+            }
+
+            .host {
+                color: #ff6e6e;
+            }
+
+            .spec {
+                color: #ff70f1;
+            }
+
+            .node {
+                color: #ffc551;
             }
 
             #input {
@@ -68,7 +98,7 @@
                 display: flex;
                 flex-direction: row;
                 align-items: center;
-                position: absolute;
+                position: sticky;
                 bottom: 10px;
                 left: 10px;
                 width: calc(100% - 20px);
@@ -81,6 +111,7 @@
     </head>
     <body>
         <div id="console">
+            <div id="output"></div>
             <div class="input-container">
                 <label for="input" class="prompt">admin@AppleDeck: $</label>
                 <input id="input" type="text" />
@@ -90,6 +121,65 @@
         <script src="/socket.io/socket.io.js"></script>
         <script>
             let socket = io("/node");
+
+            const output = document.getElementById("output");
+
+            socket.on("history", history => {
+                for (i = 0; i < history.length; i++) {
+                    let h = history[i];
+                    const element = document.createElement("p");
+                    const type = document.createElement("span");
+                    const log = document.createElement("span");
+
+                    // CLNT
+                    if (h.startsWith("[CLNT] ")) {
+                        h = h.replace("[CLNT] ", "");
+                        type.innerText = "[CLNT] ";
+                        type.classList.add("clnt");
+                    }
+
+                    // JOIN
+                    else if (h.startsWith("[JOIN] ")) {
+                        h = h.replace("[JOIN] ", "");
+                        type.innerText = "[JOIN] ";
+                        type.classList.add("join");
+                    }
+
+                    // USER
+                    else if (h.startsWith("[USER] ")) {
+                        h = h.replace("[USER] ", "");
+                        type.innerText = "[USER] ";
+                        type.classList.add("user");
+                    }
+
+                    // HOST
+                    else if (h.startsWith("[HOST] ")) {
+                        h = h.replace("[HOST] ", "");
+                        type.innerText = "[HOST] ";
+                        type.classList.add("host");
+                    }
+
+                    // SPEC
+                    else if (h.startsWith("[SPEC] ")) {
+                        h = h.replace("[SPEC] ", "");
+                        type.innerText = "[SPEC] ";
+                        type.classList.add("spec");
+                    }
+
+                    // NODE
+                    else if (h.startsWith("[NODE] ")) {
+                        h = h.replace("[NODE] ", "");
+                        type.innerText = "[NODE] ";
+                        type.classList.add("node");
+                    }
+
+                    log.innerText = h;
+
+                    element.append(type);
+                    element.append(log);
+                    output.append(element);
+                }
+            });
         </script>
     </body>
 </html>

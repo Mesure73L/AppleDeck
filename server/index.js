@@ -71,6 +71,10 @@ app.get("/logo", (req, res) => {
     res.sendFile(dir + "/logo.png");
 });
 
+app.get("/cookies", (req, res) => {
+    res.sendFile(dir + "/cookies.js");
+});
+
 // JOIN
 
 function jout(message) {

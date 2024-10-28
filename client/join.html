@@ -172,6 +172,7 @@
         </div>
 
         <script src="/socket.io/socket.io.js"></script>
+        <script src="cookies"></script>
         <script>
             let socket = io("/join");
 
@@ -193,7 +194,11 @@
             });
 
             socket.on("user approval", approval => {
-                if (approval.permission) return (window.location.href += "user");
+                if (approval.permission) {
+                    setCookie("user", {username: username, token: approval.token}, 1);
+                    window.location.href += "user";
+                    return;
+                }
 
                 document.getElementById("error").innerText = approval.reason;
                 document.getElementById("error").style.display = "block";

@@ -97,7 +97,8 @@ join.on("connect", socket => {
     // ---
 
     socket.on("new user", originalUsername => {
-        const username = originalUsername.trim();
+        let username = originalUsername.trim();
+        username = username.length > 30 ? username.slice(0, 27) + "..." : username;
         jout(username + " is requesting to join");
 
         if (connected.includes(username)) {

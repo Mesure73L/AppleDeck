@@ -65,6 +65,7 @@ function generateToken() {
 
 function cout(message) {
     out(clntPrefix + message);
+    node.emit("output", clntPrefix + message);
 }
 
 app.get("/logo", (req, res) => {
@@ -79,6 +80,7 @@ app.get("/cookies", (req, res) => {
 
 function jout(message) {
     out(joinPrefix + message);
+    node.emit("output", joinPrefix + message);
 }
 
 app.get("/", (req, res) => {
@@ -155,6 +157,7 @@ join.on("connect", socket => {
 
 function uout(message) {
     out(userPrefix + message);
+    node.emit("output", userPrefix + message);
 }
 
 app.get("/user", (req, res) => {
@@ -175,6 +178,7 @@ user.on("connect", socket => {
 
 function hout(message) {
     out(hostPrefix + message);
+    node.emit("output", clntPrefix + message);
 }
 
 app.get("/host", (req, res) => {
@@ -195,6 +199,7 @@ host.on("connect", socket => {
 
 function sout(message) {
     out(specPrefix + message);
+    node.emit("output", specPrefix + message);
 }
 
 app.get("/spec", (req, res) => {
@@ -215,6 +220,7 @@ spec.on("connect", socket => {
 
 function nout(message) {
     out(nodePrefix + message);
+    node.emit("output", nodePrefix + message);
 }
 
 app.get("/node", (req, res) => {

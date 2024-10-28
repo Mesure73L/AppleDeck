@@ -132,7 +132,7 @@ join.on("connect", socket => {
             });
         }
 
-        if (username.length < 25) {
+        if (username.length > 25) {
             jout(username + " was denied: username too long");
             return socket.emit("user approval", {
                 permission: false,

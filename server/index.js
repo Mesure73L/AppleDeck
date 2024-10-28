@@ -129,6 +129,14 @@ join.on("connect", socket => {
             });
         }
 
+        if (username.length < 25) {
+            jout(username + " was denied: username too long");
+            return socket.emit("user approval", {
+                permission: false,
+                reason: "Nickname cannot be longer than 25 characters!"
+            });
+        }
+
         const token = generateToken();
         jout(username + " was approved");
         jout(username + "'s token is " + token);

@@ -69,7 +69,7 @@
 
 
 <!-- About the Project -->
-# About the Project
+## About the Project
 AppleDeck is a free and open source alternative to PearDeck, with a ton of extra features and capabilities.
 It is a way to make your slideshows interactive, with many different interactive elements, all while displaying
 the same slide on all users' devices.

@@ -35,7 +35,7 @@
   <h1>AppleDeck</h1>
   
   <a href="https://github.com/Mesure73L/AppleDeck">
-    <img src="https://github.com/user-attachments/assets/e9b5d858-6dfd-441b-b486-3756cd1b6c31" width="130" height="130">
+    <img src="https://github.com/user-attachments/assets/a046d442-a462-4077-8461-444c51157503" width="130" height="130" alt="AppleDeck Logo">
   </a>
   
   <p>A free and open source PearDeck alternative</p>

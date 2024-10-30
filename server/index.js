@@ -1,7 +1,9 @@
 // CONFIG
 
+// the port that the server will be listening on
 const clntPort = 3000;
 
+// prefixes for logging to the console
 const clntPrefix = "[CLNT] ";
 const joinPrefix = "[JOIN] ";
 const userPrefix = "[USER] ";
@@ -9,12 +11,15 @@ const hostPrefix = "[HOST] ";
 const specPrefix = "[SPEC] ";
 const nodePrefix = "[NODE] ";
 
+// the names of namespaces
+// changing this will require changing it in the html files too
 const joinNamespace = "/join";
 const userNamespace = "/user";
 const hostNamespace = "/host";
 const specNamespace = "/spec";
 const nodeNamespace = "/node";
 
+// the length of user tokens
 const tokenLength = 5;
 
 // SETUP SERVERS

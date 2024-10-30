@@ -19,14 +19,14 @@
                 background: linear-gradient(to bottom left, #00351b, #000000);
             }
 
-            #form {
+            form {
                 position: absolute;
                 left: 50%;
                 top: 50%;
                 transform: translate(-50%, -50%);
             }
 
-            #label {
+            label {
                 color: #9e49c8;
                 font-family: "Rubik Spray Paint", Roboto, Arial, sans-serif;
                 display: block;
@@ -34,7 +34,7 @@
                 font-size: 50px;
             }
 
-            #username {
+            input {
                 outline: none;
                 border: 4px solid #9e49c8;
                 border-top-left-radius: 10px;
@@ -44,9 +44,10 @@
                 font-family: Roboto, Arial, sans-serif;
                 text-align: center;
                 font-size: 30px;
+                background-color: #ffffff;
             }
 
-            #submit {
+            button {
                 outline: none;
                 border: 4px solid #9e49c8;
                 border-top-right-radius: 10px;
@@ -61,18 +62,23 @@
                 cursor: pointer;
             }
 
-            #submit:hover {
+            button:hover {
                 background-color: #ffffff;
                 color: #9e49c8;
             }
 
-            #error {
+            .error {
                 font-family: Roboto, Arial, sans-serif;
                 font-size: 20px;
                 text-align: center;
                 color: #f96f5d;
                 margin-top: 10px;
                 display: none;
+            }
+
+            #hostcode {
+                border-radius: 10px;
+                color: #000000;
             }
 
             .loading-animation-container {
@@ -152,14 +158,60 @@
                     transform: translate(48px, 0);
                 }
             }
+
+            #types {
+                color: #c2c2c2;
+                margin: 0;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+
+            #types a {
+                color: inherit;
+                text-decoration: none;
+            }
+
+            #types .active {
+                color: rgb(255, 132, 0);
+            }
         </style>
     </head>
     <body>
-        <form id="form">
-            <label id="label" for="username">Choose a nickname:</label>
+        <p id="types">
+            Switch account type:
+            <a href="#" id="userselect" class="active">User</a>
+            |
+            <a href="#" id="hostselect">Host</a>
+            |
+            <a href="#" id="specselect">Spectator</a>
+            |
+            <a href="#" id="nodeselect">Console</a>
+        </p>
+
+        <form id="userform">
+            <label for="username">Choose a nickname:</label>
             <input id="username" name="username" maxlength="25" />
-            <button id="submit" name="submit" type="submit">Go!</button>
-            <p id="error"></p>
+            <button name="submit" type="submit">Go!</button>
+            <p class="error" id="usererror"></p>
+        </form>
+
+        <form id="hostform" style="display: none">
+            <label for="hostcode">Your code:</label>
+            <input id="hostcode" name="hostcode" disabled />
+        </form>
+
+        <form id="specform" style="display: none">
+            <label for="specname">Choose a nickname:</label>
+            <input id="specname" name="specname" maxlength="25" />
+            <button name="submit" type="submit">Go!</button>
+            <p class="error" id="specerror"></p>
+        </form>
+
+        <form id="nodeform" style="display: none">
+            <label for="nodecode">Enter code:</label>
+            <input id="nodecode" name="nodecode" maxlength="6" />
+            <button name="submit" type="submit">Go!</button>
+            <p class="error" id="nodeerror"></p>
         </form>
 
         <div class="loading-animation-container" id="loading">
@@ -176,12 +228,69 @@
         <script>
             let socket = io("/join");
 
-            const form = document.getElementById("form");
+            const userselect = document.getElementById("userselect");
+            const hostselect = document.getElementById("hostselect");
+            const specselect = document.getElementById("specselect");
+            const nodeselect = document.getElementById("nodeselect");
+
+            const userform = document.getElementById("userform");
+            const hostform = document.getElementById("hostform");
+            const specform = document.getElementById("specform");
+            const nodeform = document.getElementById("nodeform");
+
             const usernameInput = document.getElementById("username");
 
             let username;
 
-            form.addEventListener("submit", e => {
+            userselect.addEventListener("click", () => {
+                userselect.classList.add("active");
+                hostselect.classList.remove("active");
+                specselect.classList.remove("active");
+                nodeselect.classList.remove("active");
+
+                userform.style.display = "block";
+                hostform.style.display = "none";
+                specform.style.display = "none";
+                nodeform.style.display = "none";
+            });
+
+            hostselect.addEventListener("click", () => {
+                userselect.classList.remove("active");
+                hostselect.classList.add("active");
+                specselect.classList.remove("active");
+                nodeselect.classList.remove("active");
+
+                userform.style.display = "none";
+                hostform.style.display = "block";
+                specform.style.display = "none";
+                nodeform.style.display = "none";
+            });
+
+            specselect.addEventListener("click", () => {
+                userselect.classList.remove("active");
+                hostselect.classList.remove("active");
+                specselect.classList.add("active");
+                nodeselect.classList.remove("active");
+
+                userform.style.display = "none";
+                hostform.style.display = "none";
+                specform.style.display = "block";
+                nodeform.style.display = "none";
+            });
+
+            nodeselect.addEventListener("click", () => {
+                userselect.classList.remove("active");
+                hostselect.classList.remove("active");
+                specselect.classList.remove("active");
+                nodeselect.classList.add("active");
+
+                userform.style.display = "none";
+                hostform.style.display = "none";
+                specform.style.display = "none";
+                nodeform.style.display = "block";
+            });
+
+            userform.addEventListener("submit", e => {
                 e.preventDefault();
 
                 usernameInput.value = usernameInput.value.trim();
@@ -200,10 +309,10 @@
                     return;
                 }
 
-                document.getElementById("error").innerText = approval.reason;
-                document.getElementById("error").style.display = "block";
+                document.getElementById("usererror").innerText = approval.reason;
+                document.getElementById("usererror").style.display = "block";
                 document.getElementById("loading").style.display = "none";
-                document.getElementById("form").style.display = "block";
+                document.getElementById("userform").style.display = "block";
             });
         </script>
     </body>

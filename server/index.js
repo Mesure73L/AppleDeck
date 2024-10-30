@@ -75,6 +75,8 @@ function generateToken() {
 
 // SETUP COMMAND FUNCTIONS
 
+const dangerousCommands = [];
+
 function executeCommand(command) {
     // session ...
     if (command.startsWith("session")) {
@@ -97,7 +99,10 @@ function executeCommand(command) {
     out("Command not found");
 }
 
-function canHostExecute(command) {}
+function canHostExecute(command) {
+    if (dangerousCommands.includes(command)) return true;
+    return false;
+}
 
 // CLNT
 

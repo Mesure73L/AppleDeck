@@ -78,6 +78,10 @@
                 color: #ffc551;
             }
 
+            .admin {
+                color: #b91515;
+            }
+
             #input {
                 margin-left: 10px;
                 width: 100%;
@@ -113,7 +117,7 @@
         <div id="console">
             <div id="output"></div>
             <div class="input-container">
-                <label for="input" class="prompt">admin@AppleDeck: $</label>
+                <label for="input" class="prompt">admin@AppleDeck $</label>
                 <input id="input" type="text" />
             </div>
         </div>
@@ -122,6 +126,7 @@
         <script>
             let socket = io("/node");
 
+            const input = document.getElementById("input");
             const output = document.getElementById("output");
 
             function addLine(line) {
@@ -171,6 +176,13 @@
                     type.classList.add("node");
                 }
 
+                // ADMIN@APPLEDECK
+                else if (line.startsWith("admin@AppleDeck $ ")) {
+                    line = line.replace("admin@AppleDeck $ ", "");
+                    type.innerText = "admin@AppleDeck $ ";
+                    type.classList.add("admin");
+                }
+
                 log.innerText = line;
 
                 element.append(type);
@@ -192,6 +204,16 @@
 
             socket.on("output", line => {
                 addLine(line);
+            });
+
+            input.addEventListener("keydown", e => {
+                if (e.key == "Enter" || e.keyCode == 13) {
+                    if (input.value.trim() != "") {
+                        addLine("admin@AppleDeck $ " + input.value.trim());
+                        socket.emit("command", input.value.trim());
+                        input.value = "";
+                    }
+                }
             });
         </script>
     </body>

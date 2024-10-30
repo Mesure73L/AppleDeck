@@ -34,7 +34,7 @@ const host = io.of(hostNamespace);
 const spec = io.of(specNamespace);
 const node = io.of(nodeNamespace);
 
-// OTHER SETUP
+// SETUP VARIABLES, FUNCTIONS, AND OTHER LIBRARIES
 
 const {profanity, CensorType} = require("@2toad/profanity");
 
@@ -43,7 +43,19 @@ let userTokens = [];
 let banned = [];
 let history = [];
 
+let joinConnected = 0;
+let userConnected = 0;
+let hostConnected = 0;
+let specConnected = 0;
+let nodeConnected = 0;
+
 function out(message) {
+    console.log(message);
+    history.push(message);
+    node.emit("output", message);
+}
+
+function log(message) {
     console.log(message);
     history.push(message);
 }
@@ -61,11 +73,36 @@ function generateToken() {
     return token.replaceAll("0.", "");
 }
 
+// SETUP COMMAND FUNCTIONS
+
+function executeCommand(command) {
+    // session ...
+    if (command.startsWith("session")) {
+        const cmd = command.substring(7).trim();
+
+        // session count
+        if (cmd == "count") {
+            let count =
+                joinConnected + userConnected + hostConnected + specConnected + nodeConnected;
+            out("There are currently " + count + " total clients connected.");
+            out(" - " + joinConnected + " join connections");
+            out(" - " + userConnected + " user connections");
+            out(" - " + hostConnected + " host connections");
+            out(" - " + specConnected + " spec connections");
+            out(" - " + nodeConnected + " node connections");
+            return;
+        }
+    }
+
+    out("Command not found");
+}
+
+function canHostExecute(command) {}
+
 // CLNT
 
 function cout(message) {
     out(clntPrefix + message);
-    node.emit("output", clntPrefix + message);
 }
 
 app.get("/logo", (req, res) => {
@@ -80,7 +117,6 @@ app.get("/cookies", (req, res) => {
 
 function jout(message) {
     out(joinPrefix + message);
-    node.emit("output", joinPrefix + message);
 }
 
 app.get("/", (req, res) => {
@@ -89,9 +125,11 @@ app.get("/", (req, res) => {
 
 join.on("connect", socket => {
     jout("client connected");
+    joinConnected++;
 
     socket.on("disconnect", () => {
         jout("client disconnected");
+        joinConnected--;
     });
 
     // ---
@@ -101,6 +139,7 @@ join.on("connect", socket => {
         username = username.length > 30 ? username.slice(0, 27) + "..." : username;
         jout(username + " is requesting to join");
 
+        // name in use
         if (connected.includes(username)) {
             jout(username + " was denied: name in use");
             return socket.emit("user approval", {
@@ -109,6 +148,7 @@ join.on("connect", socket => {
             });
         }
 
+        // name is blank
         if (username == "" || username == undefined) {
             jout(username + " was denied: name is blank");
             return socket.emit("user approval", {
@@ -117,6 +157,7 @@ join.on("connect", socket => {
             });
         }
 
+        // name is banned
         if (banned.includes(username)) {
             jout(username + " was denied: name is banned");
             return socket.emit("user approval", {
@@ -125,6 +166,7 @@ join.on("connect", socket => {
             });
         }
 
+        // name contains profanity
         if (profanity.exists(username)) {
             jout(username + " was denied: name contains profanity");
             return socket.emit("user approval", {
@@ -133,6 +175,7 @@ join.on("connect", socket => {
             });
         }
 
+        // username too long
         if (username.length > 25) {
             jout(username + " was denied: username too long");
             return socket.emit("user approval", {
@@ -141,6 +184,7 @@ join.on("connect", socket => {
             });
         }
 
+        // username approved
         const token = generateToken();
         jout(username + " was approved");
         jout(username + "'s token is " + token);
@@ -158,7 +202,6 @@ join.on("connect", socket => {
 
 function uout(message) {
     out(userPrefix + message);
-    node.emit("output", userPrefix + message);
 }
 
 app.get("/user", (req, res) => {
@@ -167,9 +210,11 @@ app.get("/user", (req, res) => {
 
 user.on("connect", socket => {
     uout("client connected");
+    userConnected++;
 
     socket.on("disconnect", () => {
         uout("client disconnected");
+        userConnected--;
     });
 
     // ---
@@ -179,7 +224,6 @@ user.on("connect", socket => {
 
 function hout(message) {
     out(hostPrefix + message);
-    node.emit("output", clntPrefix + message);
 }
 
 app.get("/host", (req, res) => {
@@ -188,19 +232,27 @@ app.get("/host", (req, res) => {
 
 host.on("connect", socket => {
     hout("client connected");
+    hostConnected++;
 
     socket.on("disconnect", () => {
         hout("client disconnected");
+        hostConnected--;
     });
 
     // ---
+
+    host.on("command", command => {
+        log("host@AppleDeck $ " + command);
+
+        if (canHostExecute(command)) return executeCommand(command);
+        out("Command not found");
+    });
 });
 
 // SPEC
 
 function sout(message) {
     out(specPrefix + message);
-    node.emit("output", specPrefix + message);
 }
 
 app.get("/spec", (req, res) => {
@@ -209,9 +261,11 @@ app.get("/spec", (req, res) => {
 
 spec.on("connect", socket => {
     sout("client connected");
+    specConnected++;
 
     socket.on("disconnect", () => {
         sout("client disconnected");
+        specConnected--;
     });
 
     // ---
@@ -221,7 +275,6 @@ spec.on("connect", socket => {
 
 function nout(message) {
     out(nodePrefix + message);
-    node.emit("output", nodePrefix + message);
 }
 
 app.get("/node", (req, res) => {
@@ -230,14 +283,22 @@ app.get("/node", (req, res) => {
 
 node.on("connect", socket => {
     nout("client connected");
+    nodeConnected++;
 
     socket.on("disconnect", () => {
         nout("client disconnected");
+        nodeConnected--;
     });
 
     // ---
 
     socket.emit("history", history);
+
+    socket.on("command", command => {
+        log("admin@AppleDeck $ " + command);
+
+        executeCommand(command);
+    });
 });
 
 // START SERVERS

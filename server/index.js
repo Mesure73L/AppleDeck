@@ -123,6 +123,14 @@ app.get("/cookies", (req, res) => {
     res.sendFile(dir + "/cookies.js");
 });
 
+app.get("/slideshow", (req, res) => {
+    res.sendFile(dir + "/slideshow.xml");
+});
+
+app.get("/renderer", (req, res) => {
+    res.sendFile(dir + "/renderer.js");
+});
+
 // JOIN
 
 function jout(message) {

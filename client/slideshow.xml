@@ -1,0 +1,33 @@
+<Slideshow>
+    <Title>Slideshow Example</Title>
+    <Description>An AppleDeck slideshow example.</Description>
+    <Authors>
+        <Author>
+            <Name>Mesure73L</Name>
+            <URL>https://github.com/Mesure73L</URL>
+        </Author>
+    </Authors>
+    <License>CC0-1.0 Universal</License>
+    <Slides>
+        <Slide>
+            <Title>Title Slide</Title>
+            <SpeakerNotes>This is the title slide.\nTalk about title slide things.</SpeakerNotes>
+            <BackgroundColor>#9E49C8</BackgroundColor>
+            <Elements>
+                <Element>
+                    <Type>Static</Type>
+                    <Template>Text</Template>
+                    <Text>Title Slide</Text>
+                    <Color>white</Color>
+                    <FontFamily>Helvetica</FontFamily>
+                    <FontSize>30</FontSize>
+                    <Position>
+                        <Top>Center</Top>
+                        <Left>Center</Left>
+                        <Rotation>0</Rotation>
+                    </Position>
+                </Element>
+            </Elements>
+        </Slide>
+    </Slides>
+</Slideshow>

@@ -8,9 +8,32 @@
     </head>
     <body>
         <script src="/socket.io/socket.io.js"></script>
+        <script src="/renderer"></script>
         <script src="cookies"></script>
         <script>
             let socket = io("/user");
+            let engine;
+
+            function ajax(url) {
+                return new Promise(function (resolve, reject) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = function () {
+                        resolve(this.responseText);
+                    };
+                    xhr.onerror = reject;
+                    xhr.open("GET", url);
+                    xhr.send();
+                });
+            }
+
+            ajax(`slideshow`)
+                .then(function (result) {
+                    engine = new RenderEngine(result);
+                    document.body.innerText = JSON.stringify(engine.getSlideshow());
+                })
+                .catch(function (e) {
+                    alert(e);
+                });
         </script>
     </body>
 </html>

@@ -8,6 +8,10 @@
         </Author>
     </Authors>
     <License>CC0-1.0 Universal</License>
+    <Size>
+        <Width>1920</Width>
+        <Height>1080</Height>
+    </Size>
     <Slides>
         <Slide>
             <Title>Title Slide</Title>

@@ -5,14 +5,53 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>AppleDeck Presentation</title>
         <link rel="icon" type="image/x-png" href="logo" />
+        <style>
+            * {
+                margin: 0;
+            }
+
+            body {
+                margin: 0;
+                overflow: hidden;
+                height: 100vh;
+                width: 100vw;
+                background-color: #141414;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #container {
+                width: 1920px;
+                height: 1080px;
+                transform-origin: center center;
+                aspect-ratio: 16/9;
+            }
+
+            #slide {
+                width: 100%;
+                height: 100%;
+                background-color: #ff0000;
+            }
+        </style>
     </head>
     <body>
+        <div id="container">
+            <div id="slide">
+                <h1>test</h1>
+            </div>
+        </div>
         <script src="/socket.io/socket.io.js"></script>
         <script src="/renderer"></script>
         <script src="cookies"></script>
         <script>
             let socket = io("/user");
             let engine;
+            let width;
+            let height;
+            let slideshow;
+
+            const slide = document.getElementById("container");
 
             function ajax(url) {
                 return new Promise(function (resolve, reject) {
@@ -29,11 +68,42 @@
             ajax(`slideshow`)
                 .then(function (result) {
                     engine = new RenderEngine(result);
-                    document.body.innerText = JSON.stringify(engine.getSlideshow());
+                    let slideshow = engine.getSlideshow();
+
+                    const designWidth = slideshow.size.width;
+                    const designHeight = slideshow.size.height;
+                    const viewportWidth = window.innerWidth;
+                    const viewportHeight = window.innerHeight;
+
+                    const scaleFactor = Math.min(
+                        viewportWidth / designWidth,
+                        viewportHeight / designHeight
+                    );
+
+                    slide.style.width = `${designWidth}px`;
+                    slide.style.height = `${designHeight}px`;
+                    slide.style.transform = `scale(${scaleFactor})`;
+                    slide.style.aspectRatio = engine.getAspectRatioDivision();
                 })
                 .catch(function (e) {
                     alert(e);
                 });
+
+            window.addEventListener("resize", function () {
+                const designWidth = 1920;
+                const designHeight = 1080;
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+
+                const scaleFactor = Math.min(
+                    viewportWidth / designWidth,
+                    viewportHeight / designHeight
+                );
+
+                slide.style.width = `${designWidth}px`;
+                slide.style.height = `${designHeight}px`;
+                slide.style.transform = `scale(${scaleFactor})`;
+            });
         </script>
     </body>
 </html>

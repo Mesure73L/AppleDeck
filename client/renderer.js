@@ -1,6 +1,8 @@
 class RenderEngine {
     constructor(slideshow) {
         this.slideshow = this.xmlToJson(slideshow);
+        this.width = this.getSlideshow().size.width;
+        this.height = this.getSlideshow().size.height;
     }
 
     getSlideshow() {
@@ -72,5 +74,18 @@ class RenderEngine {
         }
 
         return convertXmlToJson(xmlDoc.documentElement);
+    }
+
+    getAspectRatio() {
+        const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+        const greatestCommonDivisor = gcd(this.width, this.height);
+        const simplifiedWidth = this.width / greatestCommonDivisor;
+        const simplifiedHeight = this.height / greatestCommonDivisor;
+        return `${simplifiedWidth}:${simplifiedHeight}`;
+    }
+
+    getAspectRatioDivision() {
+        const ratio = this.getAspectRatio().split(":");
+        return parseInt(ratio[0]) / parseInt(ratio[1]);
     }
 }

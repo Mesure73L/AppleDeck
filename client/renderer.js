@@ -17,6 +17,54 @@ class RenderEngine {
         return this.getSlideshow().slides[slide];
     }
 
+    getSlide(slide) {
+        const elements = this.getSlideJSON(slide).elements;
+        const html = document.createElement("div");
+        html.style.width = "100%";
+        html.style.height = "100%";
+        html.style.backgroundColor = this.getSlideJSON(slide).backgroundColor;
+
+        for (let i = 0; i < elements.length; i++) {
+            const e = elements[i];
+            if (e.type == "Static") {
+                if (e.template == "Text") {
+                    const element = document.createElement("p");
+                    element.innerText = e.text;
+                    element.style.color = e.color;
+                    element.style.fontFamily = e.fontFamily;
+                    element.style.fontSize = e.fontSize + "px";
+                    element.style.position = "absolute";
+
+                    if (e.position.x == "Center") {
+                        element.style.left = "50%";
+                        element.style.transform = "translateX(-50%)";
+                    } else if (e.position.x.startsWith("-")) {
+                        element.style.right = e.position.x.substring(1) + "px";
+                    } else {
+                        element.style.left = e.position.x + "px";
+                    }
+
+                    if (e.position.y == "Center") {
+                        element.style.top = "50%";
+                        element.style.transform = "translateY(-50%)";
+                    } else if (e.position.y.startsWith("-")) {
+                        element.style.bottom = e.position.y.substring(1) + "px";
+                    } else {
+                        element.style.top = e.position.y + "px";
+                    }
+
+                    if (e.position.x == "Center" && e.position.y == "Center") {
+                        element.style.transform = "translate(-50%, -50%)";
+                    }
+
+                    html.append(element);
+                }
+            }
+        }
+
+        return html;
+    }
+
     xmlToJson(xml) {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xml, "text/xml");

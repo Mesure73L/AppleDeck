@@ -24,10 +24,10 @@
                     <Text>Title Slide</Text>
                     <Color>white</Color>
                     <FontFamily>Helvetica</FontFamily>
-                    <FontSize>30</FontSize>
+                    <FontSize>100</FontSize>
                     <Position>
-                        <Top>Center</Top>
-                        <Left>Center</Left>
+                        <X>Center</X>
+                        <Y>Center</Y>
                         <Rotation>0</Rotation>
                     </Position>
                 </Element>

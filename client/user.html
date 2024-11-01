@@ -37,9 +37,7 @@
     </head>
     <body>
         <div id="container">
-            <div id="slide">
-                <h1>test</h1>
-            </div>
+            <div id="slide"></div>
         </div>
         <script src="/socket.io/socket.io.js"></script>
         <script src="/renderer"></script>
@@ -79,6 +77,9 @@
                         viewportWidth / designWidth,
                         viewportHeight / designHeight
                     );
+
+                    slide.innerHTML = "";
+                    slide.append(engine.getSlide(0));
 
                     slide.style.width = `${designWidth}px`;
                     slide.style.height = `${designHeight}px`;

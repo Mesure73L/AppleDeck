@@ -6,6 +6,16 @@
         <title>AppleDeck Console</title>
         <link rel="icon" type="image/x-png" href="logo" />
         <style>
+            #console,
+            #output {
+                overflow-y: scroll;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                &::-webkit-scrollbar {
+                    display: none;
+                }
+            }
+
             body {
                 background-color: #1e1e1e;
                 font-family: monospace;

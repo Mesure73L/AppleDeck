@@ -114,7 +114,7 @@ function generateToken() {
 
 // SETUP COMMAND FUNCTIONS
 
-const dangerousCommands = [];
+const dangerousCommands = ["devmode"];
 
 function executeCommand(command) {
     // devmode ...
@@ -260,7 +260,8 @@ function executeCommand(command) {
 
 function canHostExecute(command) {
     if (devmode) return true;
-    if (dangerousCommands.includes(command)) return false;
+    const check = new RegExp(`^(${dangerousCommands.join("|")})`);
+    if (check.test(command)) return false;
     return true;
 }
 

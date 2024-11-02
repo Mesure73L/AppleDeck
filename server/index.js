@@ -142,7 +142,15 @@ function executeCommand(command) {
             return;
         }
 
-        //slide jump
+        // slide first
+        else if (cmd == "first") {
+            slide = 0;
+            user.emit("slide", slide);
+            out("Jumped to the first slide.");
+            return;
+        }
+
+        // slide jump ...
         else if (cmd.startsWith("jump")) {
             const jump = cmd.substring(4).trim();
 
@@ -164,6 +172,40 @@ function executeCommand(command) {
                 return;
             } else {
                 out("That slide does not exist!");
+                return;
+            }
+        }
+
+        // slide last
+        else if (cmd == "last") {
+            slide = slideshow.Slideshow.Slides.Slide.length - 1;
+            user.emit("slide", slide);
+            out("Jumped to the last slide (slide " + (slide + 1) + ").");
+            return;
+        }
+
+        // slide next
+        else if (cmd == "next") {
+            if (slide == slideshow.Slideshow.Slides.Slide.length - 1) {
+                out("There are no more slides.");
+                return;
+            } else {
+                slide += 1;
+                user.emit("slide", slide);
+                out("Went to the next slide (slide " + (slide + 1) + ").");
+                return;
+            }
+        }
+
+        // slide previous
+        else if (cmd == "previous") {
+            if (slide == 0) {
+                out("You are on the first slide.");
+                return;
+            } else {
+                slide -= 1;
+                user.emit("slide", slide);
+                out("Went to the previous slide (slide " + (slide + 1) + ").");
                 return;
             }
         }

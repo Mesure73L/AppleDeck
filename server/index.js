@@ -41,7 +41,22 @@ const node = io.of(nodeNamespace);
 
 // SETUP VARIABLES, FUNCTIONS, AND OTHER LIBRARIES
 
+const fs = require("fs");
 const {profanity, CensorType} = require("@2toad/profanity");
+const xml2js = require("xml2js");
+
+async function xmlToJson(xmlString) {
+    const parser = new xml2js.Parser({explicitArray: false});
+    return new Promise((resolve, reject) => {
+        parser.parseString(xmlString, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        });
+    });
+}
 
 let connected = [];
 let userTokens = [];
@@ -55,6 +70,20 @@ let specConnected = 0;
 let nodeConnected = 0;
 
 let slide = 0;
+let slideshow;
+
+fs.readFile(dir + "/slideshow.xml", async (err, data) => {
+    if (err) {
+        out(err);
+        return;
+    }
+    try {
+        const json = await xmlToJson(data.toString("utf8"));
+        slideshow = json;
+    } catch (err) {
+        out(err);
+    }
+});
 
 function out(message) {
     console.log(message);
@@ -129,9 +158,14 @@ function executeCommand(command) {
                 return;
             }
 
-            user.emit("slide", jump - 1);
-            out("Jumped to slide " + jump + ".");
-            return;
+            if (slideshow.Slideshow.Slides.Slide[jump - 1] != undefined) {
+                user.emit("slide", jump - 1);
+                out("Jumped to slide " + jump + ".");
+                return;
+            } else {
+                out("That slide does not exist!");
+                return;
+            }
         }
     }
 

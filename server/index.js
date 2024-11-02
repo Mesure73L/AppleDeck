@@ -112,6 +112,27 @@ function executeCommand(command) {
             out("The current slide is slide " + (slide + 1) + ".");
             return;
         }
+
+        //slide jump
+        else if (cmd.startsWith("jump")) {
+            const jump = cmd.substring(4).trim();
+
+            if (jump == "" || jump == undefined) {
+                out("Slide must be an integer.");
+                return;
+            }
+
+            try {
+                slide = parseInt(jump);
+            } catch (e) {
+                out("Slide must be an integer.");
+                return;
+            }
+
+            user.emit("slide", jump - 1);
+            out("Jumped to slide " + jump + ".");
+            return;
+        }
     }
 
     out("Command not found");
@@ -249,6 +270,8 @@ user.on("connect", socket => {
     });
 
     // ---
+
+    socket.emit("slide", slide);
 });
 
 // HOST

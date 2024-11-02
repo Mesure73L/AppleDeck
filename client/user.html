@@ -78,9 +78,6 @@
                         viewportHeight / designHeight
                     );
 
-                    slide.innerHTML = "";
-                    slide.append(engine.getSlide(0));
-
                     slide.style.width = `${designWidth}px`;
                     slide.style.height = `${designHeight}px`;
                     slide.style.transform = `scale(${scaleFactor})`;
@@ -89,6 +86,11 @@
                 .catch(function (e) {
                     alert(e);
                 });
+
+            socket.on("slide", s => {
+                slide.innerHTML = "";
+                slide.append(engine.getSlide(s));
+            });
 
             window.addEventListener("resize", function () {
                 const designWidth = 1920;

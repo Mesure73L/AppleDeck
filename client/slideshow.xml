@@ -33,5 +33,25 @@
                 </Element>
             </Elements>
         </Slide>
+        <Slide>
+            <Title>Slide 2</Title>
+            <SpeakerNotes>This is the second slide.\nTalk about second slide things.</SpeakerNotes>
+            <BackgroundColor>#000000</BackgroundColor>
+            <Elements>
+                <Element>
+                    <Type>Static</Type>
+                    <Template>Text</Template>
+                    <Text>Second Slide</Text>
+                    <Color>white</Color>
+                    <FontFamily>Roboto Mono</FontFamily>
+                    <FontSize>30</FontSize>
+                    <Position>
+                        <X>100</X>
+                        <Y>-50</Y>
+                        <Rotation>0</Rotation>
+                    </Position>
+                </Element>
+            </Elements>
+        </Slide>
     </Slides>
 </Slideshow>

@@ -57,6 +57,12 @@ class RenderEngine {
                         element.style.transform = "translate(-50%, -50%)";
                     }
 
+                    WebFont.load({
+                        google: {
+                            families: [e.fontFamily]
+                        }
+                    });
+
                     html.append(element);
                 }
             }

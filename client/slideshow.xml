@@ -23,7 +23,7 @@
                     <Template>Text</Template>
                     <Text>Title Slide</Text>
                     <Color>white</Color>
-                    <FontFamily>Helvetica</FontFamily>
+                    <FontFamily>Itim</FontFamily>
                     <FontSize>100</FontSize>
                     <Position>
                         <X>Center</X>

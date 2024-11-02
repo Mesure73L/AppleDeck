@@ -72,6 +72,9 @@ let nodeConnected = 0;
 let slide = 0;
 let slideshow;
 
+let devmode = false;
+let devmodeConfirm;
+
 fs.readFile(dir + "/slideshow.xml", async (err, data) => {
     if (err) {
         out(err);
@@ -114,8 +117,49 @@ function generateToken() {
 const dangerousCommands = [];
 
 function executeCommand(command) {
+    // devmode ...
+    if (command.startsWith("devmode")) {
+        const cmd = command.substring(7).trim();
+
+        // devmode disable
+        if (cmd == "disable") {
+            if (devmode) {
+                devmode = false;
+                out("Disabled devmode.");
+                return;
+            } else {
+                out("Devmode was already disabled.");
+                return;
+            }
+        }
+
+        // devmode enable
+        if (cmd == "enable") {
+            if (devmode) return out("Devmode was already enabled.");
+
+            const now = Date.now();
+
+            if (now - devmodeConfirm < 60000) {
+                devmode = true;
+                out(
+                    'Enabled devmode. You can disable it at any time by running "devmode disable".'
+                );
+                devmodeConfirm = 0;
+                return;
+            } else {
+                devmodeConfirm = now;
+                out("Are you sure you want to enable devmode?");
+                out("Devmode allows the host client to run any command.");
+                out(
+                    'Type "devmode enable" again in the next 60 seconds if you would like to enable devmode.'
+                );
+                return;
+            }
+        }
+    }
+
     // session ...
-    if (command.startsWith("session")) {
+    else if (command.startsWith("session")) {
         const cmd = command.substring(7).trim();
 
         // session count
@@ -215,8 +259,9 @@ function executeCommand(command) {
 }
 
 function canHostExecute(command) {
-    if (dangerousCommands.includes(command)) return true;
-    return false;
+    if (devmode) return true;
+    if (dangerousCommands.includes(command)) return false;
+    return true;
 }
 
 // CLNT

@@ -54,6 +54,8 @@ let hostConnected = 0;
 let specConnected = 0;
 let nodeConnected = 0;
 
+let slide = 0;
+
 function out(message) {
     console.log(message);
     history.push(message);
@@ -97,6 +99,17 @@ function executeCommand(command) {
             out(" - " + hostConnected + " host connections");
             out(" - " + specConnected + " spec connections");
             out(" - " + nodeConnected + " node connections");
+            return;
+        }
+    }
+
+    // slide ...
+    else if (command.startsWith("slide")) {
+        const cmd = command.substring(5).trim();
+
+        // slide current
+        if (cmd == "current") {
+            out("The current slide is slide " + (slide + 1) + ".");
             return;
         }
     }

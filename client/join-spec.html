@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Join AppleDeck</title>
+        <link rel="icon" type="image/x-png" href="logo" />
+        <style>
+            @import url("https://fonts.googleapis.com/css?family=Rubik Spray Paint&display=swap");
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                width: 100dvh;
+                height: 100dvh;
+                overflow: hidden;
+                background: linear-gradient(to bottom left, #00351b, #000000);
+            }
+
+            #form {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            #label {
+                color: #9e49c8;
+                font-family: "Rubik Spray Paint", Roboto, Arial, sans-serif;
+                display: block;
+                text-align: center;
+                font-size: 50px;
+            }
+
+            #username {
+                outline: none;
+                border: 4px solid #9e49c8;
+                border-top-left-radius: 10px;
+                border-bottom-left-radius: 10px;
+                width: 500px;
+                height: 50px;
+                font-family: Roboto, Arial, sans-serif;
+                text-align: center;
+                font-size: 30px;
+            }
+
+            #submit {
+                outline: none;
+                border: 4px solid #9e49c8;
+                border-top-right-radius: 10px;
+                border-bottom-right-radius: 10px;
+                width: 75px;
+                height: 50px;
+                font-family: Roboto, Arial, sans-serif;
+                text-align: center;
+                font-size: 30px;
+                background-color: #9e49c8;
+                color: #ffffff;
+                cursor: pointer;
+            }
+
+            #submit:hover {
+                background-color: #ffffff;
+                color: #9e49c8;
+            }
+
+            #error {
+                font-family: Roboto, Arial, sans-serif;
+                font-size: 20px;
+                text-align: center;
+                color: #f96f5d;
+                margin-top: 10px;
+                display: none;
+            }
+
+            .loading-animation-container {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                display: none;
+            }
+
+            .lds-ellipsis {
+                display: inline-block;
+                position: relative;
+                width: 160px;
+                height: 100px;
+            }
+
+            .lds-ellipsis div {
+                position: absolute;
+                bottom: 14px;
+                width: 26px;
+                height: 26px;
+                border-radius: 50%;
+                background: #9e49c8;
+                animation-timing-function: cubic-bezier(0, 1, 1, 0);
+            }
+
+            .lds-ellipsis div:nth-child(1) {
+                left: 16px;
+                animation: lds-ellipsis1 0.6s infinite;
+            }
+
+            .lds-ellipsis div:nth-child(2) {
+                left: 16px;
+                animation: lds-ellipsis2 0.6s infinite;
+            }
+
+            .lds-ellipsis div:nth-child(3) {
+                left: 64px;
+                animation: lds-ellipsis2 0.6s infinite;
+            }
+
+            .lds-ellipsis div:nth-child(4) {
+                left: 112px;
+                animation: lds-ellipsis3 0.6s infinite;
+            }
+
+            @keyframes lds-ellipsis1 {
+                0% {
+                    transform: scale(0);
+                }
+
+                100% {
+                    transform: scale(1);
+                }
+            }
+
+            @keyframes lds-ellipsis3 {
+                0% {
+                    transform: scale(1);
+                }
+
+                100% {
+                    transform: scale(0);
+                }
+            }
+
+            @keyframes lds-ellipsis2 {
+                0% {
+                    transform: translate(0, 0);
+                }
+
+                100% {
+                    transform: translate(48px, 0);
+                }
+            }
+
+            #types {
+                color: #c2c2c2;
+                margin: 0;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+
+            #types a {
+                color: inherit;
+                text-decoration: none;
+            }
+
+            #types .active {
+                color: rgb(255, 132, 0);
+            }
+        </style>
+    </head>
+    <body>
+        <p id="types">
+            Switch account type:
+            <a href="/../join-user" id="userselect">User</a>
+            |
+            <a href="/../join-host" id="hostselect">Host</a>
+            |
+            <a href="#" id="specselect" class="active">Spectator</a>
+            |
+            <a href="/../join-node" id="nodeselect">Console</a>
+        </p>
+
+        <form id="form">
+            <label id="label" for="username">Choose a nickname:</label>
+            <input id="username" name="username" maxlength="25" />
+            <button id="submit" name="submit" type="submit">Go!</button>
+            <p id="error"></p>
+        </form>
+
+        <div class="loading-animation-container" id="loading">
+            <div class="lds-ellipsis">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="cookies"></script>
+        <script>
+            let socket = io("/join");
+
+            const form = document.getElementById("form");
+            const usernameInput = document.getElementById("username");
+
+            let username;
+
+            form.addEventListener("submit", e => {
+                e.preventDefault();
+
+                usernameInput.value = usernameInput.value.trim();
+
+                socket.emit("new user", {type: "spec", username: usernameInput.value});
+                username = usernameInput.value;
+
+                document.getElementById("form").style.display = "none";
+                document.getElementById("loading").style.display = "flex";
+            });
+
+            socket.on("user approval", approval => {
+                if (approval.permission) {
+                    setCookie("user", {username: username, token: approval.token}, 1);
+                    window.location.href += "/../spec";
+                    return;
+                }
+
+                document.getElementById("error").innerText = approval.reason;
+                document.getElementById("error").style.display = "block";
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("form").style.display = "block";
+            });
+        </script>
+    </body>
+</html>

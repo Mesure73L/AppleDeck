@@ -96,7 +96,6 @@ function out(message) {
 
 function log(message) {
     console.log(message);
-    history.push(message);
 }
 
 function generateToken() {
@@ -308,7 +307,23 @@ function jout(message) {
 }
 
 app.get("/", (req, res) => {
-    res.sendFile(dir + "/join.html");
+    res.redirect("/join-user");
+});
+
+app.get("/join-user", (req, res) => {
+    res.sendFile(dir + "/join-user.html");
+});
+
+app.get("/join-host", (req, res) => {
+    res.sendFile(dir + "/join-host.html");
+});
+
+app.get("/join-spec", (req, res) => {
+    res.sendFile(dir + "/join-spec.html");
+});
+
+app.get("/join-node", (req, res) => {
+    res.sendFile(dir + "/join-node.html");
 });
 
 join.on("connect", socket => {

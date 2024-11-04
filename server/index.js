@@ -112,6 +112,20 @@ function generateToken() {
     return token.replaceAll("0.", "");
 }
 
+function generateCode() {
+    const characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let code = "";
+
+    for (let i = 0; i < 6; i++) {
+        if (i === 3) {
+            code += "-";
+        }
+        code += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+
+    return code;
+}
+
 // SETUP COMMAND FUNCTIONS
 
 const dangerousCommands = ["devmode"];
@@ -308,67 +322,94 @@ join.on("connect", socket => {
 
     // ---
 
-    socket.on("new user", originalUsername => {
-        let username = originalUsername.trim();
-        username = username.length > 30 ? username.slice(0, 27) + "..." : username;
-        jout(username + " is requesting to join");
+    socket.on("new user", request => {
+        // user and spec
+        if (request.type == "user" || request.type == "spec") {
+            let username = request.username.trim();
+            username = username.length > 30 ? username.slice(0, 27) + "..." : username;
+            jout(username + " is requesting to join");
 
-        // name in use
-        if (connected.includes(username)) {
-            jout(username + " was denied: name in use");
-            return socket.emit("user approval", {
-                permission: false,
-                reason: "Nickname is already in use!"
+            // name in use
+            if (connected.includes(username)) {
+                jout(username + " was denied: name in use");
+                return socket.emit("user approval", {
+                    permission: false,
+                    reason: "Nickname is already in use!"
+                });
+            }
+
+            // name is blank
+            if (username == "" || username == undefined) {
+                jout(username + " was denied: name is blank");
+                return socket.emit("user approval", {
+                    permission: false,
+                    reason: "Nickname cannot be blank!"
+                });
+            }
+
+            // name is banned
+            if (banned.includes(username)) {
+                jout(username + " was denied: name is banned");
+                return socket.emit("user approval", {
+                    permission: false,
+                    reason: "Nickname is banned!"
+                });
+            }
+
+            // name contains profanity
+            if (profanity.exists(username)) {
+                jout(username + " was denied: name contains profanity");
+                return socket.emit("user approval", {
+                    permission: false,
+                    reason: "Nickname cannot contain profanity!"
+                });
+            }
+
+            // username too long
+            if (username.length > 25) {
+                jout(username + " was denied: username too long");
+                return socket.emit("user approval", {
+                    permission: false,
+                    reason: "Nickname cannot be longer than 25 characters!"
+                });
+            }
+
+            // username approved
+            const token = generateToken();
+            jout(username + " was approved");
+            jout(username + "'s token is " + token);
+            connected.push(username);
+            userTokens.push({username: username, token: token});
+
+            socket.emit("user approval", {
+                permission: true,
+                token: token
             });
         }
 
-        // name is blank
-        if (username == "" || username == undefined) {
-            jout(username + " was denied: name is blank");
-            return socket.emit("user approval", {
-                permission: false,
-                reason: "Nickname cannot be blank!"
-            });
+        // host
+        else if (request.type == "host") {
         }
 
-        // name is banned
-        if (banned.includes(username)) {
-            jout(username + " was denied: name is banned");
-            return socket.emit("user approval", {
-                permission: false,
-                reason: "Nickname is banned!"
+        // node
+        else if (request.type == "node") {
+            const code = generateCode();
+            const now = Date.now();
+            log("A request for console access was sent.");
+            log("To verify it, give the following code to the requester: " + code);
+
+            socket.emit("node ready");
+            socket.on("node code", nodeCode => {
+                if (nodeCode == code && Date.now() - now < 60000) {
+                    socket.emit("node approval", {permission: true, token: generateToken()});
+                } else {
+                    socket.emit("node approval", {
+                        permission: false,
+                        reason: "The code you provided is either invalid or expired."
+                    });
+                }
             });
         }
-
-        // name contains profanity
-        if (profanity.exists(username)) {
-            jout(username + " was denied: name contains profanity");
-            return socket.emit("user approval", {
-                permission: false,
-                reason: "Nickname cannot contain profanity!"
-            });
-        }
-
-        // username too long
-        if (username.length > 25) {
-            jout(username + " was denied: username too long");
-            return socket.emit("user approval", {
-                permission: false,
-                reason: "Nickname cannot be longer than 25 characters!"
-            });
-        }
-
-        // username approved
-        const token = generateToken();
-        jout(username + " was approved");
-        jout(username + "'s token is " + token);
-        connected.push(username);
-        userTokens.push({username: username, token: token});
-
-        socket.emit("user approval", {
-            permission: true,
-            token: token
-        });
     });
 });
 

@@ -105,6 +105,69 @@ class RenderEngine {
                     html.append(element);
                 }
             }
+
+            // INTERACTIVE ELEMENTS
+            else if (e.type == "Interactive") {
+
+                // button
+                if (e.template == "Button") {
+                    const element = document.createElement("button");
+                    element.innerText = e.text;
+                    element.style.color = e.color;
+                    element.style.fontFamily = e.fontFamily;
+                    element.style.fontSize = e.fontSize + "px";
+                    element.style.backgroundColor = e.backgroundColor;
+                    element.style.border = `${e.border.size}px ${e.border.style} ${e.border.color}`;
+                    element.id = e.id;
+                    element.style.width = e.size.width + "px";
+                    element.style.height = e.size.height + "px";
+                    element.style.position = "absolute";
+                    element.style.rotate = e.position.rotation + "deg";
+                    element.style.cursor = "pointer";
+
+                    element.addEventListener("mouseover", () => {
+                        element.style.color = e.hover.color;
+                        element.style.backgroundColor = e.hover.backgroundColor;
+                        element.style.border = `${e.hover.border.size}px ${e.hover.border.style} ${e.hover.border.color}`;
+                    });
+
+                    element.addEventListener("mouseout", () => {
+                        element.style.color = e.color;
+                        element.style.backgroundColor = e.backgroundColor;
+                        element.style.border = `${e.border.size}px ${e.border.style} ${e.border.color}`;
+                    });
+
+                    if (e.position.x == "Center") {
+                        element.style.left = "50%";
+                        element.style.transform = "translateX(-50%)";
+                    } else if (e.position.x.startsWith("-")) {
+                        element.style.right = e.position.x.substring(1) + "px";
+                    } else {
+                        element.style.left = e.position.x + "px";
+                    }
+
+                    if (e.position.y == "Center") {
+                        element.style.top = "50%";
+                        element.style.transform = "translateY(-50%)";
+                    } else if (e.position.y.startsWith("-")) {
+                        element.style.bottom = e.position.y.substring(1) + "px";
+                    } else {
+                        element.style.top = e.position.y + "px";
+                    }
+
+                    if (e.position.x == "Center" && e.position.y == "Center") {
+                        element.style.transform = "translate(-50%, -50%)";
+                    }
+
+                    WebFont.load({
+                        google: {
+                            families: [e.fontFamily]
+                        }
+                    });
+
+                    html.append(element);
+                }
+            }
         }
 
         return html;

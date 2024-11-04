@@ -45,6 +45,38 @@
                         <Rotation>50</Rotation>
                     </Position>
                 </Element>
+                <Element>
+                    <Type>Interactive</Type>
+                    <Template>Button</Template>
+                    <Text>Click me</Text>
+                    <Color>#FF0000</Color>
+                    <BackgroundColor>#000000</BackgroundColor>
+                    <Border>
+                        <Size>3</Size>
+                        <Style>solid</Style>
+                        <Color>#FFFFFF</Color>
+                    </Border>
+                    <Hover>
+                        <Color>#000000</Color>
+                        <BackgroundColor>#FFFFFF</BackgroundColor>
+                        <Border>
+                            <Size>3</Size>
+                            <Style>solid</Style>
+                            <Color>#000000</Color>
+                        </Border>
+                    </Hover>
+                    <FontFamily>Roboto Mono</FontFamily>
+                    <FontSize>50</FontSize>
+                    <Size>
+                        <Width>500</Width>
+                        <Height>100</Height>
+                    </Size>
+                    <Position>
+                        <X>Center</X>
+                        <Y>Center</Y>
+                        <Rotation>0</Rotation>
+                    </Position>
+                </Element>
             </Elements>
         </Slide>
         <Slide>

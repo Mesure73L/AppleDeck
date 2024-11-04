@@ -75,7 +75,7 @@ let slideshow;
 let devmode = false;
 let devmodeConfirm;
 
-/*fs.readFile(dir + "/slideshow.xml", async (err, data) => {
+fs.readFile(dir + "/slideshow.xml", async (err, data) => {
     if (err) {
         out(err);
         return;
@@ -86,7 +86,7 @@ let devmodeConfirm;
     } catch (err) {
         out(err);
     }
-});*/
+});
 
 function out(message) {
     console.log(message);

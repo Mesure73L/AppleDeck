@@ -28,7 +28,21 @@
                     <Position>
                         <X>Center</X>
                         <Y>Center</Y>
-                        <Rotation>0</Rotation>
+                        <Rotation>30</Rotation>
+                    </Position>
+                </Element>
+                <Element>
+                    <Type>Static</Type>
+                    <Template>Image</Template>
+                    <Source>logo</Source>
+                    <Size>
+                        <Width>500</Width>
+                        <Height>500</Height>
+                    </Size>
+                    <Position>
+                        <X>100</X>
+                        <Y>-100</Y>
+                        <Rotation>50</Rotation>
                     </Position>
                 </Element>
             </Elements>

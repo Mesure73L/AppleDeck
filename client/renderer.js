@@ -26,7 +26,11 @@ class RenderEngine {
 
         for (let i = 0; i < elements.length; i++) {
             const e = elements[i];
+
+            // STATIC ELEMENTS
             if (e.type == "Static") {
+
+                // text
                 if (e.template == "Text") {
                     const element = document.createElement("p");
                     element.innerText = e.text;
@@ -34,6 +38,7 @@ class RenderEngine {
                     element.style.fontFamily = e.fontFamily;
                     element.style.fontSize = e.fontSize + "px";
                     element.style.position = "absolute";
+                    element.style.rotate = e.position.rotation + "deg";
 
                     if (e.position.x == "Center") {
                         element.style.left = "50%";
@@ -62,6 +67,40 @@ class RenderEngine {
                             families: [e.fontFamily]
                         }
                     });
+
+                    html.append(element);
+                }
+
+                // image
+                else if (e.template == "Image") {
+                    const element = document.createElement("img");
+                    element.src = e.source;
+                    element.width = e.size.width;
+                    element.height = e.size.height;
+                    element.style.position = "absolute";
+                    element.style.rotate = e.position.rotation + "deg";
+
+                    if (e.position.x == "Center") {
+                        element.style.left = "50%";
+                        element.style.transform = "translateX(-50%)";
+                    } else if (e.position.x.startsWith("-")) {
+                        element.style.right = e.position.x.substring(1) + "px";
+                    } else {
+                        element.style.left = e.position.x + "px";
+                    }
+
+                    if (e.position.y == "Center") {
+                        element.style.top = "50%";
+                        element.style.transform = "translateY(-50%)";
+                    } else if (e.position.y.startsWith("-")) {
+                        element.style.bottom = e.position.y.substring(1) + "px";
+                    } else {
+                        element.style.top = e.position.y + "px";
+                    }
+
+                    if (e.position.x == "Center" && e.position.y == "Center") {
+                        element.style.transform = "translate(-50%, -50%)";
+                    }
 
                     html.append(element);
                 }

@@ -59,7 +59,7 @@ async function xmlToJson(xmlString) {
 }
 
 let connected = [];
-let userTokens = [];
+let userTokens = [{username: "admin", token: "admin"}];
 let banned = [];
 let history = [];
 
@@ -436,6 +436,25 @@ function uout(message) {
 
 app.get("/user", (req, res) => {
     res.sendFile(dir + "/user.html");
+});
+
+user.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+
+    if (token == undefined) {
+        uout("client denied: no token");
+        return next(new Error("No token provided"));
+    }
+
+    const userToken = userTokens.find(ut => ut.token == token);
+
+    if (userToken == undefined) {
+        uout("client denied: invalid token");
+        return next(new Error("Invalid token"));
+    }
+
+    uout(userToken.username + " connected");
+    next();
 });
 
 user.on("connect", socket => {

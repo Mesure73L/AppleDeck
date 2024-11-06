@@ -17,5 +17,5 @@ function getCookie(cname) {
             return JSON.parse(atob(c.substring(name.length, c.length)));
         }
     }
-    return "";
+    return null;
 }

@@ -43,6 +43,8 @@
         <script src="cookies"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
         <script>
+            if (getCookie("user") == null) window.location.href = "../join-user";
+
             const socket = io("/user", {
                 auth: {
                     token: getCookie("user").token

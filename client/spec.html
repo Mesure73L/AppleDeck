@@ -8,8 +8,19 @@
     </head>
     <body>
         <script src="/socket.io/socket.io.js"></script>
+        <script src="cookies"></script>
         <script>
-            const socket = io("/spec");
+            if (getCookie("user") == null) window.location.href = "../join-spec";
+
+            const socket = io("/spec", {
+                auth: {
+                    token: getCookie("user").token
+                }
+            });
+
+            socket.on("connect_error", err => {
+                window.location.href = "../join-spec";
+            });
         </script>
     </body>
 </html>

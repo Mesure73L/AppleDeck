@@ -60,6 +60,8 @@ async function xmlToJson(xmlString) {
 
 let connected = [];
 let userAccounts = [];
+let specAccounts = [];
+let nodeAccounts = [];
 let banned = [];
 let history = [];
 
@@ -394,7 +396,9 @@ join.on("connect", socket => {
             jout(username + " was approved");
             jout(username + "'s token is " + token);
             connected.push(username);
-            userAccounts.push({username: username, token: token});
+
+            if (request.type == "user") userAccounts.push({username: username, token: token});
+            if (request.type == "spec") specAccounts.push({username: username, token: token});
 
             socket.emit("user approval", {
                 permission: true,
@@ -416,7 +420,9 @@ join.on("connect", socket => {
             socket.emit("node ready");
             socket.on("node code", nodeCode => {
                 if (nodeCode == code && Date.now() - now < 60000) {
-                    socket.emit("node approval", {permission: true, token: generateToken()});
+                    const token = generateToken();
+                    socket.emit("node approval", {permission: true, token: token});
+                    nodeAccounts.push({token: token});
                 } else {
                     socket.emit("node approval", {
                         permission: false,
@@ -510,6 +516,25 @@ app.get("/spec", (req, res) => {
     res.sendFile(dir + "/spec.html");
 });
 
+spec.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+
+    if (token == undefined) {
+        sout("client denied: no token");
+        return next(new Error("No token provided"));
+    }
+
+    const specToken = specAccounts.find(st => st.token == token);
+
+    if (specToken == undefined) {
+        sout("client denied: invalid token");
+        return next(new Error("Invalid token"));
+    }
+
+    sout(specToken.username + " connected");
+    next();
+});
+
 spec.on("connect", socket => {
     sout("client connected");
     specConnected++;
@@ -530,6 +555,25 @@ function nout(message) {
 
 app.get("/node", (req, res) => {
     res.sendFile(dir + "/node.html");
+});
+
+node.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+
+    if (token == undefined) {
+        nout("client denied: no token");
+        return next(new Error("No token provided"));
+    }
+
+    const nodeToken = nodeAccounts.find(nt => nt.token == token);
+
+    if (nodeToken == undefined) {
+        nout("client denied: invalid token");
+        return next(new Error("Invalid token"));
+    }
+
+    nout("client connected");
+    next();
 });
 
 node.on("connect", socket => {

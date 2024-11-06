@@ -133,8 +133,19 @@
         </div>
 
         <script src="/socket.io/socket.io.js"></script>
+        <script src="cookies"></script>
         <script>
-            const socket = io("/node");
+            if (getCookie("user") == null) window.location.href = "../join-node";
+            
+            const socket = io("/node", {
+                auth: {
+                    token: getCookie("user").token
+                }
+            });
+
+            socket.on("connect_error", err => {
+                window.location.href = "../join-node";
+            });
 
             const input = document.getElementById("input");
             const output = document.getElementById("output");

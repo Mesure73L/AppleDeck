@@ -59,7 +59,7 @@ async function xmlToJson(xmlString) {
 }
 
 let connected = [];
-let userTokens = [{username: "admin", token: "admin"}];
+let userAccounts = [];
 let banned = [];
 let history = [];
 
@@ -394,7 +394,7 @@ join.on("connect", socket => {
             jout(username + " was approved");
             jout(username + "'s token is " + token);
             connected.push(username);
-            userTokens.push({username: username, token: token});
+            userAccounts.push({username: username, token: token});
 
             socket.emit("user approval", {
                 permission: true,
@@ -446,7 +446,7 @@ user.use((socket, next) => {
         return next(new Error("No token provided"));
     }
 
-    const userToken = userTokens.find(ut => ut.token == token);
+    const userToken = userAccounts.find(ut => ut.token == token);
 
     if (userToken == undefined) {
         uout("client denied: invalid token");

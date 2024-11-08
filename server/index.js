@@ -219,7 +219,7 @@ function executeCommand(command) {
             }
 
             try {
-                slide = parseInt(jump);
+                slide = parseInt(jump) - 1;
             } catch (e) {
                 out("Slide must be an integer.");
                 return;
@@ -288,7 +288,7 @@ function executeCommand(command) {
                 user.sockets.forEach(socket => {
                     if (socket.username == kick) {
                         userFound = true;
-                        
+
                         socket.emit("kicked");
                         socket.disconnect(true);
                         socket.authenticated = false;

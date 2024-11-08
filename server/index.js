@@ -288,8 +288,12 @@ function executeCommand(command) {
                 user.sockets.forEach(socket => {
                     if (socket.username == kick) {
                         userFound = true;
+                        
+                        socket.emit("kicked");
                         socket.disconnect(true);
                         socket.authenticated = false;
+
+                        userAccounts = userAccounts.filter(account => account.username !== kick);
 
                         out(kick + " has been kicked.");
                         return;

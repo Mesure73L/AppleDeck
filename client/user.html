@@ -55,6 +55,11 @@
                 window.location.href = "../join-user";
             });
 
+            socket.on("kicked", () => {
+                setCookie("user", "", -1);
+                window.location.href = "../join-user";
+            });
+
             let engine;
             let width;
             let height;

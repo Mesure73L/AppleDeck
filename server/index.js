@@ -276,7 +276,8 @@ function executeCommand(command) {
         const cmd = command.substring(4).trim();
 
         // user kick ...
-        if (cmd.startsWith("kick")) {
+        // user ban ...
+        if (cmd.startsWith("kick") || cmd.startsWith("ban")) {
             const kick = cmd.substring(4).trim();
 
             if (kick == "" || kick == undefined) {
@@ -295,8 +296,14 @@ function executeCommand(command) {
                         socket.authenticated = false;
 
                         userAccounts = userAccounts.filter(account => account.username !== kick);
+                        connected = connected.filter(user => user !== kick);
+                        
+                        if (cmd.startsWith("ban")) {
+                            banned.push(kick);
+                            out(kick + " has been kicked and the usernamed has been banned.");
+                        }
 
-                        out(kick + " has been kicked.");
+                        if (cmd.startsWith("kick")) out(kick + " has been kicked.");
                         return;
                     }
                 });

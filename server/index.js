@@ -310,9 +310,26 @@ function executeCommand(command) {
                 if (!userFound) out("An unrecognized error occurred.");
                 return;
             } else {
-                out("User not found.");
+                banned.push(kick);
+                out(kick + " was not found, but the username was banned.");
                 return;
             }
+        }
+
+        // user unban
+        if (cmd.startsWith("unban")) {
+            const unban = cmd.substring(6).trim();
+
+            if (unban == "" || unban == undefined) return out ("Username must be specified.");
+
+            if (banned.includes(unban)) {
+                banned = banned.filter(user => user !== unban);
+                out(unban + " has been unbanned.");
+                return;
+            }
+
+            out("That username is not banned.");
+            return;
         }
     }
 

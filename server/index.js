@@ -270,6 +270,40 @@ function executeCommand(command) {
         }
     }
 
+    // user ...
+    else if (command.startsWith("user")) {
+        const cmd = command.substring(4).trim();
+
+        // user kick ...
+        if (cmd.startsWith("kick")) {
+            const kick = cmd.substring(4).trim();
+
+            if (kick == "" || kick == undefined) {
+                out("User must be specified.");
+                return;
+            }
+
+            if (connected.includes(kick)) {
+                let userFound = false;
+                user.sockets.forEach(socket => {
+                    if (socket.username == kick) {
+                        userFound = true;
+                        socket.disconnect(true);
+                        socket.authenticated = false;
+
+                        out(kick + " has been kicked.");
+                        return;
+                    }
+                });
+                if (!userFound) out("An unrecognized error occurred.");
+                return;
+            } else {
+                out("User not found.");
+                return;
+            }
+        }
+    }
+
     out("Command not found");
 }
 
@@ -464,11 +498,14 @@ user.use((socket, next) => {
 });
 
 user.on("connect", socket => {
-    uout("client connected");
+    const username = userAccounts.find(ut => ut.token == socket.handshake.auth.token).username;
+    socket.username = username;
+
+    uout(username + " connected");
     userConnected++;
 
     socket.on("disconnect", () => {
-        uout("client disconnected");
+        uout(username + " disconnected");
         userConnected--;
     });
 

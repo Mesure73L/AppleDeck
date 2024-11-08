@@ -219,6 +219,7 @@ function executeCommand(command) {
             }
 
             try {
+                if (slide == parseInt(jump) - 1) return out("You are already on that slide.");
                 slide = parseInt(jump) - 1;
             } catch (e) {
                 out("Slide must be an integer.");

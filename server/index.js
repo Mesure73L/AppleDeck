@@ -63,6 +63,8 @@ let userAccounts = [];
 let specAccounts = [];
 let nodeAccounts = [];
 let banned = [];
+let allowed = [];
+let allowlist = false;
 let history = [];
 
 let joinConnected = 0;
@@ -132,6 +134,70 @@ function generateCode() {
 const dangerousCommands = ["devmode"];
 
 function executeCommand(command) {
+    // allowlist ...
+    if (command.startsWith("allowlist")) {
+        const cmd = command.substring(9).trim();
+
+        // allowlist add ...
+        if (cmd.startsWith("add")) {
+            const add = cmd.substring(3).trim();
+
+            if (add == "" || add == undefined) return out("Username must be specified.");
+
+            if (allowed.includes(add)) return out("That username is already allowed.");
+
+            allowed.push(add);
+            out(add + " has been added to the allowlist.");
+            return;
+        }
+
+        // allowlist disable
+        if (cmd == "disable") {
+            if (!allowlist) return out("Allowlist was already disabled.");
+            allowlist = false;
+            out("Disabled the allowlist.");
+            return;
+        }
+
+        // allowlist enable
+        if (cmd == "enable") {
+            if (allowlist) return out("Allowlist was already enabled.");
+            allowlist = true;
+            out("Enabled the allowlist.");
+            return;
+        }
+
+        // allowlist list
+        if (cmd == "list") {
+            if (!allowlist) {
+                out("The allowlist is currently disabled.");
+                out("However, the following usernames are allowed:");
+            } else {
+                out("The following usernames are allowed:");
+            }
+
+            if (allowed.length == 0) return out("The allowlist is empty.");
+
+            allowed.forEach(user => {
+                out(" - " + user);
+            });
+            return;
+        }
+
+        // allowlist remove ...
+        if (cmd.startsWith("remove")) {
+            const remove = cmd.substring(6).trim();
+
+            if (remove == "" || remove == undefined) return out("Username must be specified.");
+
+            if (!allowed.includes(remove)) return out("That username was not allowed.");
+
+            allowed = allowed.filter(user => user !== remove);
+            out(remove + " has been removed from the allowlist.");
+            return;
+        }
+    }
+
     // devmode ...
     if (command.startsWith("devmode")) {
         const cmd = command.substring(7).trim();
@@ -297,7 +363,7 @@ function executeCommand(command) {
 
                         userAccounts = userAccounts.filter(account => account.username !== kick);
                         connected = connected.filter(user => user !== kick);
-                        
+
                         if (cmd.startsWith("ban")) {
                             banned.push(kick);
                             out(kick + " has been kicked and the usernamed has been banned.");
@@ -320,7 +386,7 @@ function executeCommand(command) {
         if (cmd.startsWith("unban")) {
             const unban = cmd.substring(6).trim();
 
-            if (unban == "" || unban == undefined) return out ("Username must be specified.");
+            if (unban == "" || unban == undefined) return out("Username must be specified.");
 
             if (banned.includes(unban)) {
                 banned = banned.filter(user => user !== unban);
@@ -424,6 +490,15 @@ join.on("connect", socket => {
                 return socket.emit("user approval", {
                     permission: false,
                     reason: "Nickname cannot be blank!"
+                });
+            }
+
+            // name is not approved
+            if (allowlist && !allowed.includes(username)) {
+                jout(username + " was denied: name is not approved");
+                return socket.emit("user approval", {
+                    permission: false,
+                    reason: "Nickname is not approved!"
                 });
             }
 

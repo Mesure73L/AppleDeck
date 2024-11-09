@@ -94,7 +94,7 @@ function setSlideshow(url) {
                 return;
             });
     } else {
-        fs.readFile(dir + url, async (err, data) => {
+        fs.readFile(dir + "/" + url, async (err, data) => {
             if (err) {
                 out("Failed to start the slideshow.");
                 out("This could be due to the URL being invalid or the file isn't in XML format.");

@@ -44,6 +44,7 @@ const node = io.of(nodeNamespace);
 const fs = require("fs");
 const {profanity, CensorType} = require("@2toad/profanity");
 const xml2js = require("xml2js");
+const axios = require("axios");
 
 async function xmlToJson(xmlString) {
     const parser = new xml2js.Parser({explicitArray: false});
@@ -75,22 +76,48 @@ let nodeConnected = 0;
 
 let slide = 0;
 let slideshow;
+let slideshowRaw;
 
 let devmode = false;
 let devmodeConfirm;
 
-fs.readFile(dir + "/slideshow.xml", async (err, data) => {
-    if (err) {
-        out(err);
-        return;
+function setSlideshow(url) {
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+        axios
+            .get(url)
+            .then(response => {
+                processSlideshowData(response.data);
+            })
+            .catch(error => {
+                out("Failed to start the slideshow.");
+                out("This could be due to the URL being invalid or the file isn't in XML format.");
+                return;
+            });
+    } else {
+        fs.readFile(dir + url, async (err, data) => {
+            if (err) {
+                out("Failed to start the slideshow.");
+                out("This could be due to the URL being invalid or the file isn't in XML format.");
+                return;
+            }
+            processSlideshowData(data.toString("utf8"));
+        });
     }
+}
+
+async function processSlideshowData(data) {
     try {
-        const json = await xmlToJson(data.toString("utf8"));
+        const json = await xmlToJson(data);
         slideshow = json;
+        slideshowRaw = data;
+        out("Slideshow started.");
+        return true;
     } catch (err) {
-        out(err);
+        out("Failed to start the slideshow.");
+        out("This could be due to the URL being invalid or the file isn't in XML format.");
+        return false;
     }
-});
+}
 
 function out(message) {
     console.log(message);
@@ -253,6 +280,17 @@ function executeCommand(command) {
             out(" - " + hostConnected + " host connections");
             out(" - " + specConnected + " spec connections");
             out(" - " + nodeConnected + " node connections");
+            return;
+        }
+
+        // session start ...
+        else if (cmd.startsWith("start")) {
+            const start = cmd.substring(5).trim();
+
+            if (start == "" || start == undefined) return out("Slideshow URL must be specified.");
+
+            setSlideshow(start);
+
             return;
         }
     }
@@ -424,7 +462,7 @@ app.get("/cookies", (req, res) => {
 });
 
 app.get("/slideshow", (req, res) => {
-    res.sendFile(dir + "/slideshow.xml");
+    res.send(slideshowRaw);
 });
 
 app.get("/renderer", (req, res) => {

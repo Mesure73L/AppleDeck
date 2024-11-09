@@ -8,6 +8,7 @@
         <style>
             * {
                 margin: 0;
+                padding: 0;
             }
 
             body {
@@ -32,12 +33,30 @@
                 width: 100%;
                 height: 100%;
             }
+
+            #nav {
+                width: 125px;
+                height: 40px;
+                z-index: 100;
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                color: white;
+                background-color: #545454;
+                line-height: 40px;
+                border-radius: 16px;
+                font-family: Roboto, Arial, Helvetica, sans-serif;
+                font-size: 18px;
+                text-align: center;
+            }
         </style>
     </head>
     <body>
         <div id="container">
             <div id="slide"></div>
         </div>
+        <div id="nav"><p id="currentslide">Slide ?/?</p></div>
         <script src="/socket.io/socket.io.js"></script>
         <script src="/renderer"></script>
         <script src="cookies"></script>
@@ -84,6 +103,10 @@
                     engine = new RenderEngine(result);
                     let slideshow = engine.getSlideshow();
 
+                    document.getElementById("currentslide").innerText = `Slide ?/${
+                        engine.getAllSlides().length
+                    }`;
+
                     const designWidth = slideshow.size.width;
                     const designHeight = slideshow.size.height;
                     const viewportWidth = window.innerWidth;
@@ -106,6 +129,9 @@
             socket.on("slide", s => {
                 slide.innerHTML = "";
                 slide.append(engine.getSlide(s));
+                document.getElementById("currentslide").innerText = `Slide ${s + 1}/${
+                    engine.getAllSlides().length
+                }`;
             });
 
             window.addEventListener("resize", function () {

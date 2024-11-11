@@ -10,11 +10,11 @@
         <script src="/socket.io/socket.io.js"></script>
         <script src="cookies"></script>
         <script>
-            if (getCookie("user") == null) window.location.href = "../join-spec";
+            if (getCookie("spec") == null) window.location.href = "../join-spec";
 
             const socket = io("/spec", {
                 auth: {
-                    token: getCookie("user").token
+                    token: getCookie("spec").token
                 }
             });
 

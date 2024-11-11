@@ -227,7 +227,7 @@
 
             socket.on("node approval", approval => {
                 if (approval.permission) {
-                    setCookie("user", {token: approval.token}, 1);
+                    setCookie("node", {token: approval.token}, 1);
                     window.location.href += "/../node";
                     return;
                 }

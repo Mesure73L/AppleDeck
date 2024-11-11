@@ -222,7 +222,7 @@
 
             socket.on("user approval", approval => {
                 if (approval.permission) {
-                    setCookie("user", {username: username, token: approval.token}, 1);
+                    setCookie("spec", {username: username, token: approval.token}, 1);
                     window.location.href += "/../spec";
                     return;
                 }

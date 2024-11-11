@@ -135,11 +135,11 @@
         <script src="/socket.io/socket.io.js"></script>
         <script src="cookies"></script>
         <script>
-            if (getCookie("user") == null) window.location.href = "../join-node";
+            if (getCookie("node") == null) window.location.href = "../join-node";
             
             const socket = io("/node", {
                 auth: {
-                    token: getCookie("user").token
+                    token: getCookie("node").token
                 }
             });
 

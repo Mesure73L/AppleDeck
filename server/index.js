@@ -77,11 +77,14 @@ let nodeConnected = 0;
 let slide = 0;
 let slideshow;
 let slideshowRaw;
+let slideshowUrl;
 
 let devmode = false;
 let devmodeConfirm;
 
 function setSlideshow(url) {
+    slideshowUrl = url;
+
     if (url.startsWith("http://") || url.startsWith("https://")) {
         axios
             .get(url)
@@ -283,8 +286,49 @@ function executeCommand(command) {
             return;
         }
 
+        // session reload ...
+        else if (cmd.startsWith("reload")) {
+            if (slideshow == undefined) return out("The session is not started.");
+
+            let reload = cmd.substring(6).trim();
+            
+            if (reload == "" || reload == undefined) reload = slideshowUrl;
+
+            setSlideshow(reload);
+            out("The session has been reloaded.");
+            return;
+        }
+
+        // session reset ...
+        else if (cmd.startsWith("reset")) {
+            if (slideshow == undefined) return out("The session is not started.");
+
+            let reset = cmd.substring(5).trim();
+
+            if (reset == "" || reset == undefined) reset = slideshowUrl;
+
+            user.sockets.forEach(socket => {
+                socket.disconnect(true);
+            });
+
+            spec.sockets.forEach(socket => {
+                socket.disconnect(true);
+            });
+
+            userAccounts = [];
+            specAccounts = [];
+
+            userConnected = 0;
+            specConnected = 0;
+
+            setSlideshow(reset);
+            return;
+        }
+
         // session start ...
         else if (cmd.startsWith("start")) {
+            if (slideshow != undefined) return out("The session is already started.");
+
             const start = cmd.substring(5).trim();
 
             if (start == "" || start == undefined) return out("Slideshow URL must be specified.");

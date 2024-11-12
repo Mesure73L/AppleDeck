@@ -291,7 +291,7 @@ function executeCommand(command) {
             if (slideshow == undefined) return out("The session is not started.");
 
             let reload = cmd.substring(6).trim();
-            
+
             if (reload == "" || reload == undefined) reload = slideshowUrl;
 
             setSlideshow(reload);
@@ -540,11 +540,9 @@ app.get("/join-node", (req, res) => {
 });
 
 join.on("connect", socket => {
-    jout("client connected");
     joinConnected++;
 
     socket.on("disconnect", () => {
-        jout("client disconnected");
         joinConnected--;
     });
 
@@ -679,7 +677,6 @@ user.use((socket, next) => {
         return next(new Error("Invalid token"));
     }
 
-    uout(userToken.username + " connected");
     next();
 });
 
@@ -711,11 +708,9 @@ app.get("/host", (req, res) => {
 });
 
 host.on("connect", socket => {
-    hout("client connected");
     hostConnected++;
 
     socket.on("disconnect", () => {
-        hout("client disconnected");
         hostConnected--;
     });
 
@@ -754,16 +749,13 @@ spec.use((socket, next) => {
         return next(new Error("Invalid token"));
     }
 
-    sout(specToken.username + " connected");
     next();
 });
 
 spec.on("connect", socket => {
-    sout("client connected");
     specConnected++;
 
     socket.on("disconnect", () => {
-        sout("client disconnected");
         specConnected--;
     });
 
@@ -800,11 +792,9 @@ node.use((socket, next) => {
 });
 
 node.on("connect", socket => {
-    nout("client connected");
     nodeConnected++;
 
     socket.on("disconnect", () => {
-        nout("client disconnected");
         nodeConnected--;
     });
 

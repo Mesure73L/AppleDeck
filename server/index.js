@@ -558,7 +558,6 @@ join.on("connect", socket => {
         if (request.type == "user" || request.type == "spec") {
             let username = request.username.trim();
             username = username.length > 30 ? username.slice(0, 27) + "..." : username;
-            jout(username + " is requesting to join");
 
             // name in use
             if (connected.includes(username)) {
@@ -617,7 +616,6 @@ join.on("connect", socket => {
             // username approved
             const token = generateToken();
             jout(username + " was approved");
-            jout(username + "'s token is " + token);
             connected.push(username);
 
             if (request.type == "user") userAccounts.push({username: username, token: token});

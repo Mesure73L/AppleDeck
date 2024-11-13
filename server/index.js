@@ -82,7 +82,19 @@ let slideshowUrl;
 let devmode = false;
 let devmodeConfirm;
 
+function slideshowError(oldSlideshow, oldSlideshowRaw, oldSlideshowUrl) {
+    out("Failed to start the slideshow.");
+    out("This could be due to the URL being invalid or the file isn't in XML format.");
+    slideshow = oldSlideshow;
+    slideshowRaw = oldSlideshowRaw;
+    slideshowUrl = oldSlideshowUrl;
+    return;
+}
+
 function setSlideshow(url) {
+    const oldSlideshow = slideshow;
+    const oldSlideshowRaw = slideshowRaw;
+    const oldSlideshowUrl = slideshowUrl;
     slideshowUrl = url;
 
     if (url.startsWith("http://") || url.startsWith("https://")) {
@@ -92,23 +104,17 @@ function setSlideshow(url) {
                 processSlideshowData(response.data);
             })
             .catch(error => {
-                out("Failed to start the slideshow.");
-                out("This could be due to the URL being invalid or the file isn't in XML format.");
-                return;
+                return slideshowError(oldSlideshow, oldSlideshowRaw, oldSlideshowUrl);
             });
     } else {
         fs.readFile(dir + "/" + url, async (err, data) => {
-            if (err) {
-                out("Failed to start the slideshow.");
-                out("This could be due to the URL being invalid or the file isn't in XML format.");
-                return;
-            }
-            processSlideshowData(data.toString("utf8"));
+            if (err) return slideshowError(oldSlideshow, oldSlideshowRaw, oldSlideshowUrl);
+            processSlideshowData(data.toString("utf8"), oldSlideshow, oldSlideshowRaw, oldSlideshowUrl);
         });
     }
 }
 
-async function processSlideshowData(data) {
+async function processSlideshowData(data, oldSlideshow, oldSlideshowRaw, oldSlideshowUrl) {
     try {
         const json = await xmlToJson(data);
         slideshow = json;
@@ -116,8 +122,7 @@ async function processSlideshowData(data) {
         out("Slideshow started.");
         return true;
     } catch (err) {
-        out("Failed to start the slideshow.");
-        out("This could be due to the URL being invalid or the file isn't in XML format.");
+        slideshowError(oldSlideshow, oldSlideshowRaw, oldSlideshowUrl);
         return false;
     }
 }

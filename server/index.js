@@ -109,7 +109,12 @@ function setSlideshow(url) {
     } else {
         fs.readFile(dir + "/" + url, async (err, data) => {
             if (err) return slideshowError(oldSlideshow, oldSlideshowRaw, oldSlideshowUrl);
-            processSlideshowData(data.toString("utf8"), oldSlideshow, oldSlideshowRaw, oldSlideshowUrl);
+            processSlideshowData(
+                data.toString("utf8"),
+                oldSlideshow,
+                oldSlideshowRaw,
+                oldSlideshowUrl
+            );
         });
     }
 }
@@ -610,6 +615,15 @@ join.on("connect", socket => {
                 return socket.emit("user approval", {
                     permission: false,
                     reason: "Nickname cannot be longer than 25 characters!"
+                });
+            }
+
+            // session not started
+            if (slideshow == null) {
+                jout(username + " was denied: session not started");
+                return socket.emit("user approval", {
+                    permission: false,
+                    reason: "There is currently no active session."
                 });
             }
 

@@ -1,5 +1,16 @@
 // CONFIG
 
+// the url to a slideshow to try and start with
+// no slideshow will be started if left blank
+const startingSlideshow = "http://127.0.0.1:5500/index.xml";
+
+// default allowlist, can be changed later in the console
+let allowlist = false;
+let allowed = [];
+
+// default denylist, can be changed later in the console
+let banned = [];
+
 // the port that the server will be listening on
 const clntPort = 3000;
 
@@ -63,9 +74,6 @@ let connected = [];
 let userAccounts = [];
 let specAccounts = [];
 let nodeAccounts = [];
-let banned = [];
-let allowed = [];
-let allowlist = false;
 let history = [];
 
 let joinConnected = 0;
@@ -130,6 +138,10 @@ async function processSlideshowData(data, oldSlideshow, oldSlideshowRaw, oldSlid
         slideshowError(oldSlideshow, oldSlideshowRaw, oldSlideshowUrl);
         return false;
     }
+}
+
+if (!startingSlideshow == "") {
+    setSlideshow(startingSlideshow);
 }
 
 function out(message) {

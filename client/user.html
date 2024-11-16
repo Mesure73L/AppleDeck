@@ -20,6 +20,7 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                font-family: Roboto, Arial, Helvetica, sans-serif;
             }
 
             #container {
@@ -51,6 +52,9 @@
                 text-align: center;
             }
         </style>
+        <link
+            href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark/dark.css"
+            rel="stylesheet" />
     </head>
     <body>
         <div id="container">
@@ -61,6 +65,7 @@
         <script src="/renderer"></script>
         <script src="cookies"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+        <script src="/sweetalert"></script>
         <script>
             if (getCookie("user") == null) window.location.href = "../join-user";
 

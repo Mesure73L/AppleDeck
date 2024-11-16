@@ -29,7 +29,6 @@ class RenderEngine {
 
             // STATIC ELEMENTS
             if (e.type == "Static") {
-
                 // text
                 if (e.template == "Text") {
                     const element = document.createElement("p");
@@ -108,7 +107,6 @@ class RenderEngine {
 
             // INTERACTIVE ELEMENTS
             else if (e.type == "Interactive") {
-
                 // button
                 if (e.template == "Button") {
                     const element = document.createElement("button");
@@ -118,7 +116,6 @@ class RenderEngine {
                     element.style.fontSize = e.fontSize + "px";
                     element.style.backgroundColor = e.backgroundColor;
                     element.style.border = `${e.border.size}px ${e.border.style} ${e.border.color}`;
-                    element.id = e.id;
                     element.style.width = e.size.width + "px";
                     element.style.height = e.size.height + "px";
                     element.style.position = "absolute";
@@ -136,6 +133,30 @@ class RenderEngine {
                         element.style.backgroundColor = e.backgroundColor;
                         element.style.border = `${e.border.size}px ${e.border.style} ${e.border.color}`;
                     });
+
+                    if (e.run && this.getSlideshow().functions.some(func => func.name == e.run)) {
+                        const run = this.getSlideshow().functions.find(func => func.name == e.run);
+
+                        // toast
+                        if (run.type == "ShowToast") {
+                            element.addEventListener("click", () => {
+                                Swal.fire({
+                                    icon: run.options.icon,
+                                    title: run.options.title,
+                                    text: run.options.text,
+                                    showConfirmButton: false,
+                                    toast: true,
+                                    position: run.options.position,
+                                    timer: run.options.duration,
+                                    timerProgressBar: true,
+                                    didOpen: toast => {
+                                        toast.onmouseenter = Swal.stopTimer;
+                                        toast.onmouseleave = Swal.resumeTimer;
+                                    }
+                                });
+                            });
+                        }
+                    }
 
                     if (e.position.x == "Center") {
                         element.style.left = "50%";
@@ -192,13 +213,23 @@ class RenderEngine {
             }
 
             if (nodeName.endsWith("s")) {
-                const list = [];
-                xmlNode.childNodes.forEach(child => {
-                    if (child.nodeType === Node.ELEMENT_NODE) {
-                        list.push(convertXmlToJson(child));
-                    }
-                });
-                return list;
+                const firstChild = Array.from(xmlNode.childNodes).find(
+                    child => child.nodeType === Node.ELEMENT_NODE
+                );
+
+                const isTruePlural =
+                    firstChild &&
+                    firstChild.nodeName.toLowerCase() === nodeName.slice(0, -1).toLowerCase();
+
+                if (isTruePlural) {
+                    const list = [];
+                    xmlNode.childNodes.forEach(child => {
+                        if (child.nodeType === Node.ELEMENT_NODE) {
+                            list.push(convertXmlToJson(child));
+                        }
+                    });
+                    return list;
+                }
             }
 
             const result = {};

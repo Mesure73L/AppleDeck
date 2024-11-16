@@ -2,7 +2,11 @@
 
 // the url to a slideshow to try and start with
 // no slideshow will be started if left blank
-const startingSlideshow = "http://127.0.0.1:5500/index.xml";
+const startingSlideshow = "";
+
+// allow toasts? must be false if app is hosted on the following tlds:
+// .ru  .su  .by  .рф
+const allowToasts = true;
 
 // default allowlist, can be changed later in the console
 let allowlist = false;
@@ -533,6 +537,11 @@ app.get("/slideshow", (req, res) => {
 
 app.get("/renderer", (req, res) => {
     res.sendFile(dir + "/renderer.js");
+});
+
+app.get("/sweetalert", (req, res) => {
+    if (!allowToasts) return res.send("");
+    res.redirect("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js");
 });
 
 // JOIN

@@ -1,12 +1,13 @@
 // CONFIG
 
+// allow toasts? must be false if app is hosted on the following tlds:
+// .ru  .su  .by  .рф
+// more information is in CONFIG_OPTIONS.md.
+const allowToasts = true;
+
 // the url to a slideshow to try and start with
 // no slideshow will be started if left blank
 const startingSlideshow = "";
-
-// allow toasts? must be false if app is hosted on the following tlds:
-// .ru  .su  .by  .рф
-const allowToasts = true;
 
 // default allowlist, can be changed later in the console
 let allowlist = false;

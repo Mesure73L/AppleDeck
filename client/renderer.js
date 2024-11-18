@@ -38,6 +38,7 @@ class RenderEngine {
                     element.style.fontSize = e.fontSize + "px";
                     element.style.position = "absolute";
                     element.style.rotate = e.position.rotation + "deg";
+                    element.style.whiteSpace = "nowrap";
 
                     if (e.position.x == "Center") {
                         element.style.left = "50%";

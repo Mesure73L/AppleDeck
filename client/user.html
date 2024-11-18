@@ -24,15 +24,23 @@
             }
 
             #container {
-                width: 1920px;
-                height: 1080px;
-                transform-origin: center center;
-                aspect-ratio: 16/9;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+                background-color: #141414;
+                position: relative;
             }
 
             #slide {
-                width: 100%;
-                height: 100%;
+                width: 1920px;
+                height: 1080px;
+                background-color: white;
+                transform-origin: center;
+                overflow: hidden;
+                position: absolute;
             }
 
             #nav {
@@ -85,11 +93,10 @@
             });
 
             let engine;
-            let width;
-            let height;
             let slideshow;
 
-            const slide = document.getElementById("container");
+            const container = document.getElementById("container");
+            const slide = document.getElementById("slide");
 
             function ajax(url) {
                 return new Promise(function (resolve, reject) {
@@ -103,29 +110,38 @@
                 });
             }
 
+            function resizeSlide() {
+                const containerWidth = container.clientWidth;
+                const containerHeight = container.clientHeight;
+                
+                const targetAspectRatio = 1920 / 1080;
+                const containerAspectRatio = containerWidth / containerHeight;
+                
+                let scale;
+                if (containerAspectRatio > targetAspectRatio) {
+                    // Container is wider than target ratio
+                    scale = containerHeight / 1080;
+                } else {
+                    // Container is taller than target ratio
+                    scale = containerWidth / 1920;
+                }
+                
+                slide.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                slide.style.position = 'absolute';
+                slide.style.left = '50%';
+                slide.style.top = '50%';
+            }
+
             ajax(`slideshow`)
                 .then(function (result) {
                     engine = new RenderEngine(result);
-                    let slideshow = engine.getSlideshow();
+                    slideshow = engine.getSlideshow();
 
                     document.getElementById("currentslide").innerText = `Slide ?/${
                         engine.getAllSlides().length
                     }`;
 
-                    const designWidth = slideshow.size.width;
-                    const designHeight = slideshow.size.height;
-                    const viewportWidth = window.innerWidth;
-                    const viewportHeight = window.innerHeight;
-
-                    const scaleFactor = Math.min(
-                        viewportWidth / designWidth,
-                        viewportHeight / designHeight
-                    );
-
-                    slide.style.width = `${designWidth}px`;
-                    slide.style.height = `${designHeight}px`;
-                    slide.style.transform = `scale(${scaleFactor})`;
-                    slide.style.aspectRatio = engine.getAspectRatioDivision();
+                    resizeSlide();
                 })
                 .catch(function (e) {
                     alert(e);
@@ -139,21 +155,7 @@
                 }`;
             });
 
-            window.addEventListener("resize", function () {
-                const designWidth = 1920;
-                const designHeight = 1080;
-                const viewportWidth = window.innerWidth;
-                const viewportHeight = window.innerHeight;
-
-                const scaleFactor = Math.min(
-                    viewportWidth / designWidth,
-                    viewportHeight / designHeight
-                );
-
-                slide.style.width = `${designWidth}px`;
-                slide.style.height = `${designHeight}px`;
-                slide.style.transform = `scale(${scaleFactor})`;
-            });
+            window.addEventListener("resize", resizeSlide);
         </script>
     </body>
 </html>

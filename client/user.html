@@ -155,6 +155,10 @@
                 }`;
             });
 
+            socket.on("slideshow updated", () => {
+                window.location.reload();
+            });
+
             window.addEventListener("resize", resizeSlide);
         </script>
     </body>

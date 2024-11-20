@@ -138,6 +138,7 @@ async function processSlideshowData(data, oldSlideshow, oldSlideshowRaw, oldSlid
         slideshow = json;
         slideshowRaw = data;
         out("Slideshow started.");
+        user.emit("slideshow updated");
         return true;
     } catch (err) {
         slideshowError(oldSlideshow, oldSlideshowRaw, oldSlideshowUrl);

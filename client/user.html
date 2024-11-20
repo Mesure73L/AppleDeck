@@ -47,7 +47,6 @@
                 width: 125px;
                 height: 40px;
                 z-index: 100;
-                position: fixed;
                 bottom: 20px;
                 left: 50%;
                 transform: translateX(-50%);
@@ -58,6 +57,23 @@
                 font-family: Roboto, Arial, Helvetica, sans-serif;
                 font-size: 18px;
                 text-align: center;
+                opacity: 1;
+                transition: opacity 0.3s ease;
+                position: fixed;
+            }
+
+            #nav::before {
+                content: '';
+                position: absolute;
+                top: -30px;
+                right: -25dvw;
+                bottom: -30px;
+                left: -25dvw;
+                z-index: -1;
+            }
+
+            #nav:hover {
+                opacity: 0.25;
             }
         </style>
         <link

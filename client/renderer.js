@@ -32,7 +32,7 @@ class RenderEngine {
                 // text
                 if (e.template == "Text") {
                     const element = document.createElement("p");
-                    element.innerText = e.text;
+                    element.innerText = e.text.replaceAll("\\n", "\n");
                     element.style.color = e.color;
                     element.style.fontFamily = e.fontFamily;
                     element.style.fontSize = e.fontSize + "px";

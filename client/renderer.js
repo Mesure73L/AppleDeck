@@ -39,6 +39,7 @@ class RenderEngine {
                     element.style.position = "absolute";
                     element.style.rotate = e.position.rotation + "deg";
                     element.style.whiteSpace = "nowrap";
+                    element.style.textAlign = e.textAlign;
 
                     if (e.position.x == "Center") {
                         element.style.left = "50%";
@@ -60,6 +61,36 @@ class RenderEngine {
 
                     if (e.position.x == "Center" && e.position.y == "Center") {
                         element.style.transform = "translate(-50%, -50%)";
+                    }
+
+                    if (e.position.origin != null) {
+                        const originY = e.position.origin.split("-")[0];
+                        const originX = e.position.origin.split("-")[1];
+                        element.style.transformOrigin = originX + " " + originY;
+
+                        let transforms = [];
+
+                        if (e.position.x.startsWith("-")) {
+                            if (originX == "center") transforms.push("translateX(25%)");
+                            else if (originX == "left") transforms.push("translateX(100%)");
+                        } else {
+                            if (originX == "center") transforms.push("translateX(-50%)");
+                            else if (originX == "right") transforms.push("translateX(-100%)");
+                        }
+
+                        if (e.position.y.startsWith("-")) {
+                            if (originY == "center") transforms.push("translateY(25%)");
+                            else if (originY == "left") transforms.push("translateY(100%)");
+                        } else {
+                            if (originY == "center") transforms.push("translateY(-50%)");
+                            else if (originY == "right") transforms.push("translateY(-100%)");
+                        }
+
+                        if (e.position.rotation) {
+                            transforms.push(`rotate(${e.position.rotation}deg)`);
+                        }
+
+                        element.style.transform = transforms.join(" ");
                     }
 
                     WebFont.load({
@@ -102,6 +133,36 @@ class RenderEngine {
                         element.style.transform = "translate(-50%, -50%)";
                     }
 
+                    if (e.position.origin != null) {
+                        const originY = e.position.origin.split("-")[0];
+                        const originX = e.position.origin.split("-")[1];
+                        element.style.transformOrigin = originX + " " + originY;
+
+                        let transforms = [];
+
+                        if (e.position.x.startsWith("-")) {
+                            if (originX == "center") transforms.push("translateX(25%)");
+                            else if (originX == "left") transforms.push("translateX(100%)");
+                        } else {
+                            if (originX == "center") transforms.push("translateX(-50%)");
+                            else if (originX == "right") transforms.push("translateX(-100%)");
+                        }
+
+                        if (e.position.y.startsWith("-")) {
+                            if (originY == "center") transforms.push("translateY(25%)");
+                            else if (originY == "left") transforms.push("translateY(100%)");
+                        } else {
+                            if (originY == "center") transforms.push("translateY(-50%)");
+                            else if (originY == "right") transforms.push("translateY(-100%)");
+                        }
+
+                        if (e.position.rotation) {
+                            transforms.push(`rotate(${e.position.rotation}deg)`);
+                        }
+
+                        element.style.transform = transforms.join(" ");
+                    }
+
                     html.append(element);
                 }
             }
@@ -139,7 +200,7 @@ class RenderEngine {
                         const run = this.getSlideshow().functions.find(func => func.name == e.run);
 
                         // toast
-                        if (run.type == "ShowToast") {
+                        if (run.type == "Toast") {
                             element.addEventListener("click", () => {
                                 Swal.fire({
                                     icon: run.options.icon,

@@ -203,13 +203,13 @@ class RenderEngine {
                         if (run.type == "Toast") {
                             element.addEventListener("click", () => {
                                 Swal.fire({
-                                    icon: run.options.icon,
-                                    title: run.options.title,
-                                    text: run.options.text,
+                                    icon: run.icon,
+                                    title: run.title,
+                                    text: run.text,
                                     showConfirmButton: false,
                                     toast: true,
-                                    position: run.options.position,
-                                    timer: run.options.duration,
+                                    position: run.position,
+                                    timer: run.duration,
                                     timerProgressBar: true,
                                     didOpen: toast => {
                                         toast.onmouseenter = Swal.stopTimer;

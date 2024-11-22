@@ -208,9 +208,14 @@
 
                 element.append(type);
                 element.append(log);
+                
+                // Check if scrolled near bottom before adding new line
+                const wasAtBottom = output.scrollHeight - output.clientHeight - output.scrollTop < 2;
+                
                 output.append(element);
-
-                if (output.scrollTop + output.offsetHeight >= output.scrollHeight) {
+                
+                // Only auto-scroll if user was already at bottom
+                if (wasAtBottom) {
                     output.scrollTop = output.scrollHeight;
                 }
             }

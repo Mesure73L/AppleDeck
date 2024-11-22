@@ -71,7 +71,7 @@ class RenderEngine {
                         let transforms = [];
 
                         if (e.position.x.startsWith("-")) {
-                            if (originX == "center") transforms.push("translateX(25%)");
+                            if (originX == "center") transforms.push("translateX(50%)");
                             else if (originX == "left") transforms.push("translateX(100%)");
                         } else {
                             if (originX == "center") transforms.push("translateX(-50%)");
@@ -80,10 +80,10 @@ class RenderEngine {
 
                         if (e.position.y.startsWith("-")) {
                             if (originY == "center") transforms.push("translateY(25%)");
-                            else if (originY == "left") transforms.push("translateY(100%)");
+                            else if (originY == "top") transforms.push("translateY(100%)");
                         } else {
                             if (originY == "center") transforms.push("translateY(-50%)");
-                            else if (originY == "right") transforms.push("translateY(-100%)");
+                            else if (originY == "bottom") transforms.push("translateY(-100%)");
                         }
 
                         if (e.position.rotation) {
@@ -141,7 +141,7 @@ class RenderEngine {
                         let transforms = [];
 
                         if (e.position.x.startsWith("-")) {
-                            if (originX == "center") transforms.push("translateX(25%)");
+                            if (originX == "center") transforms.push("translateX(50%)");
                             else if (originX == "left") transforms.push("translateX(100%)");
                         } else {
                             if (originX == "center") transforms.push("translateX(-50%)");
@@ -150,10 +150,10 @@ class RenderEngine {
 
                         if (e.position.y.startsWith("-")) {
                             if (originY == "center") transforms.push("translateY(25%)");
-                            else if (originY == "left") transforms.push("translateY(100%)");
+                            else if (originY == "top") transforms.push("translateY(100%)");
                         } else {
                             if (originY == "center") transforms.push("translateY(-50%)");
-                            else if (originY == "right") transforms.push("translateY(-100%)");
+                            else if (originY == "bottom") transforms.push("translateY(-100%)");
                         }
 
                         if (e.position.rotation) {
@@ -240,6 +240,36 @@ class RenderEngine {
 
                     if (e.position.x == "Center" && e.position.y == "Center") {
                         element.style.transform = "translate(-50%, -50%)";
+                    }
+
+                    if (e.position.origin != null) {
+                        const originY = e.position.origin.split("-")[0];
+                        const originX = e.position.origin.split("-")[1];
+                        element.style.transformOrigin = originX + " " + originY;
+
+                        let transforms = [];
+
+                        if (e.position.x.startsWith("-")) {
+                            if (originX == "center") transforms.push("translateX(50%)");
+                            else if (originX == "left") transforms.push("translateX(100%)");
+                        } else {
+                            if (originX == "center") transforms.push("translateX(-50%)");
+                            else if (originX == "right") transforms.push("translateX(-100%)");
+                        }
+
+                        if (e.position.y.startsWith("-")) {
+                            if (originY == "center") transforms.push("translateY(25%)");
+                            else if (originY == "top") transforms.push("translateY(100%)");
+                        } else {
+                            if (originY == "center") transforms.push("translateY(-50%)");
+                            else if (originY == "bottom") transforms.push("translateY(-100%)");
+                        }
+
+                        if (e.position.rotation) {
+                            transforms.push(`rotate(${e.position.rotation}deg)`);
+                        }
+
+                        element.style.transform = transforms.join(" ");
                     }
 
                     WebFont.load({

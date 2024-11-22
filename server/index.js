@@ -735,6 +735,10 @@ user.on("connect", socket => {
     // ---
 
     socket.emit("slide", slide);
+
+    socket.on("interactive - input", input => {
+        uout(username + " sent input: " + input.value + " (ID: " + input.id + ")");
+    });
 });
 
 // HOST

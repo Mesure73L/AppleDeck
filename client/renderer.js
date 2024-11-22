@@ -280,6 +280,98 @@ class RenderEngine {
 
                     html.append(element);
                 }
+
+                // input
+                else if (e.template == "Input") {
+                    const element = document.createElement("input");
+                    element.style.position = "absolute";
+                    element.style.width = e.size.width + "px";
+                    element.style.height = e.size.height + "px";
+                    element.style.placeholder = e.placeholder;
+                    element.style.color = e.color;
+                    element.style.fontFamily = e.fontFamily;
+                    element.style.fontSize = e.fontSize + "px";
+                    element.placeholder = e.placeholder.text;
+                    element.style.backgroundColor = e.backgroundColor;
+                    element.style.outline = "none";
+                    element.style.border = `${e.border.size}px ${e.border.style} ${e.border.color}`;
+                    element.style.rotate = e.position.rotation + "deg";
+                    element.style.textAlign = e.textAlign;
+                    element.style.setProperty("::placeholder", {color: e.placeholder.color});
+
+                    let debounceTimer;
+                    let lastEmitTime = 0;
+                    const DEBOUNCE_DELAY = 3000;
+
+                    element.addEventListener("keyup", () => {
+                        clearTimeout(debounceTimer);
+
+                        const now = Date.now();
+                        if (now - lastEmitTime >= DEBOUNCE_DELAY) {
+                            socket.emit("interactive - input", {id: e.id, value: element.value});
+                            lastEmitTime = now;
+                        } else {
+                            debounceTimer = setTimeout(() => {
+                                socket.emit("interactive - input", {id: e.id, value: element.value});
+                                lastEmitTime = Date.now();
+                            }, DEBOUNCE_DELAY);
+                        }
+                    });
+
+                    if (e.position.x == "Center") {
+                        element.style.left = "50%";
+                        element.style.transform = "translateX(-50%)";
+                    } else if (e.position.x.startsWith("-")) {
+                        element.style.right = e.position.x.substring(1) + "px";
+                    } else {
+                        element.style.left = e.position.x + "px";
+                    }
+
+                    if (e.position.y == "Center") {
+                        element.style.top = "50%";
+                        element.style.transform = "translateY(-50%)";
+                    } else if (e.position.y.startsWith("-")) {
+                        element.style.bottom = e.position.y.substring(1) + "px";
+                    } else {
+                        element.style.top = e.position.y + "px";
+                    }
+
+                    if (e.position.x == "Center" && e.position.y == "Center") {
+                        element.style.transform = "translate(-50%, -50%)";
+                    }
+
+                    if (e.position.origin != null) {
+                        const originY = e.position.origin.split("-")[0];
+                        const originX = e.position.origin.split("-")[1];
+                        element.style.transformOrigin = originX + " " + originY;
+
+                        let transforms = [];
+
+                        if (e.position.x.startsWith("-")) {
+                            if (originX == "center") transforms.push("translateX(50%)");
+                            else if (originX == "left") transforms.push("translateX(100%)");
+                        } else {
+                            if (originX == "center") transforms.push("translateX(-50%)");
+                            else if (originX == "right") transforms.push("translateX(-100%)");
+                        }
+
+                        if (e.position.y.startsWith("-")) {
+                            if (originY == "center") transforms.push("translateY(25%)");
+                            else if (originY == "top") transforms.push("translateY(100%)");
+                        } else {
+                            if (originY == "center") transforms.push("translateY(-50%)");
+                            else if (originY == "bottom") transforms.push("translateY(-100%)");
+                        }
+
+                        if (e.position.rotation) {
+                            transforms.push(`rotate(${e.position.rotation}deg)`);
+                        }
+
+                        element.style.transform = transforms.join(" ");
+                    }
+
+                    html.append(element);
+                }
             }
         }
 

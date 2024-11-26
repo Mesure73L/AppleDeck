@@ -63,7 +63,7 @@
             }
 
             #nav::before {
-                content: '';
+                content: "";
                 position: absolute;
                 top: -30px;
                 right: -25dvw;
@@ -76,6 +76,7 @@
                 opacity: 0.25;
             }
         </style>
+        <style id="slide-style"></style>
         <link
             href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark/dark.css"
             rel="stylesheet" />
@@ -129,24 +130,24 @@
             function resizeSlide() {
                 const containerWidth = container.clientWidth;
                 const containerHeight = container.clientHeight;
-                
+
                 const targetAspectRatio = 1920 / 1080;
                 const containerAspectRatio = containerWidth / containerHeight;
-                
+
                 let scale;
-                
+
                 if (containerAspectRatio > targetAspectRatio) scale = containerHeight / 1080;
                 else scale = containerWidth / 1920;
-                
+
                 slide.style.transform = `translate(-50%, -50%) scale(${scale})`;
-                slide.style.position = 'absolute';
-                slide.style.left = '50%';
-                slide.style.top = '50%';
+                slide.style.position = "absolute";
+                slide.style.left = "50%";
+                slide.style.top = "50%";
             }
 
             ajax(`slideshow`)
                 .then(function (result) {
-                    engine = new RenderEngine(result);
+                    engine = new RenderEngine(result, "user");
                     slideshow = engine.getSlideshow();
 
                     document.getElementById("currentslide").innerText = `Slide ?/${

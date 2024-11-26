@@ -43,6 +43,7 @@
                 position: absolute;
             }
         </style>
+        <style id="slide-style"></style>
         <link
             href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark/dark.css"
             rel="stylesheet" />
@@ -112,7 +113,7 @@
 
             ajax(`slideshow`)
                 .then(function (result) {
-                    engine = new RenderEngine(result);
+                    engine = new RenderEngine(result, "spec");
                     slideshow = engine.getSlideshow();
                     resizeSlide();
                 })

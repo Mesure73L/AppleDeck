@@ -1,8 +1,9 @@
 class RenderEngine {
-    constructor(slideshow) {
+    constructor(slideshow, type) {
         this.slideshow = this.xmlToJson(slideshow);
         this.width = this.getSlideshow().size.width;
         this.height = this.getSlideshow().size.height;
+        this.type = type;
     }
 
     getSlideshow() {
@@ -287,7 +288,6 @@ class RenderEngine {
                     element.style.position = "absolute";
                     element.style.width = e.size.width + "px";
                     element.style.height = e.size.height + "px";
-                    element.style.placeholder = e.placeholder;
                     element.style.color = e.color;
                     element.style.fontFamily = e.fontFamily;
                     element.style.fontSize = e.fontSize + "px";
@@ -297,7 +297,51 @@ class RenderEngine {
                     element.style.border = `${e.border.size}px ${e.border.style} ${e.border.color}`;
                     element.style.rotate = e.position.rotation + "deg";
                     element.style.textAlign = e.textAlign;
-                    element.style.setProperty("::placeholder", {color: e.placeholder.color});
+                    element.style.setProperty("--placeholder-color", e.placeholder.color);
+
+                    const uniqueClass = "input-" + Math.random().toString(36).substring(2, 9);
+                    element.classList.add(uniqueClass);
+
+                    const style = document.getElementById("slide-style");
+
+                    style.textContent = `
+                    .${uniqueClass}::placeholder {
+                        color: ${e.placeholder.color};
+                    }
+                    .${uniqueClass}::-webkit-input-placeholder {
+                        color: ${e.placeholder.color};
+                    }
+                    .${uniqueClass}::-moz-placeholder {
+                        color: ${e.placeholder.color};
+                    }
+                    .${uniqueClass}::-ms-input-placeholder {
+                        color: ${e.placeholder.color};
+                    }`;
+
+                    if (this.type != "user") {
+                        element.disabled = true;
+                        element.style.cursor = "not-allowed";
+                        element.style.fontFamily = e.disabled.fontFamily;
+                        element.style.fontSize = e.disabled.fontSize + "px";
+                        element.placeholder = e.disabled.text;
+                        element.style.backgroundColor = e.disabled.backgroundColor;
+                        element.style.outline = "none";
+                        element.style.border = `${e.disabled.border.size}px ${e.disabled.border.style} ${e.disabled.border.color}`;
+                        element.style.textAlign = e.disabled.textAlign;
+                        document.getElementById("slide-style").innerText = `
+                        .${uniqueClass}::placeholder {
+                            color: ${e.disabled.color};
+                        }
+                        .${uniqueClass}::-webkit-input-placeholder {
+                            color: ${e.disabled.color};
+                        }
+                        .${uniqueClass}::-moz-placeholder {
+                            color: ${e.disabled.color};
+                        }
+                        .${uniqueClass}::-ms-input-placeholder {
+                            color: ${e.disabled.color};
+                        }`;
+                    }
 
                     let debounceTimer;
                     let lastEmitTime = 0;
@@ -312,7 +356,10 @@ class RenderEngine {
                             lastEmitTime = now;
                         } else {
                             debounceTimer = setTimeout(() => {
-                                socket.emit("interactive - input", {id: e.id, value: element.value});
+                                socket.emit("interactive - input", {
+                                    id: e.id,
+                                    value: element.value
+                                });
                                 lastEmitTime = Date.now();
                             }, DEBOUNCE_DELAY);
                         }

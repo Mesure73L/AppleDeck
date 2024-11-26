@@ -139,6 +139,7 @@ async function processSlideshowData(data, oldSlideshow, oldSlideshowRaw, oldSlid
         slideshowRaw = data;
         out("Slideshow started.");
         user.emit("slideshow updated");
+        spec.emit("slideshow updated");
         return true;
     } catch (err) {
         slideshowError(oldSlideshow, oldSlideshowRaw, oldSlideshowUrl);
@@ -381,6 +382,7 @@ function executeCommand(command) {
         else if (cmd == "first") {
             slide = 0;
             user.emit("slide", slide);
+            spec.emit("slide", slide);
             out("Jumped to the first slide.");
             return;
         }
@@ -404,6 +406,7 @@ function executeCommand(command) {
 
             if (slideshow.Slideshow.Slides.Slide[jump - 1] != undefined) {
                 user.emit("slide", jump - 1);
+                spec.emit("slide", jump - 1);
                 out("Jumped to slide " + jump + ".");
                 return;
             } else {
@@ -416,6 +419,7 @@ function executeCommand(command) {
         else if (cmd == "last") {
             slide = slideshow.Slideshow.Slides.Slide.length - 1;
             user.emit("slide", slide);
+            spec.emit("slide", slide);
             out("Jumped to the last slide (slide " + (slide + 1) + ").");
             return;
         }
@@ -428,6 +432,7 @@ function executeCommand(command) {
             } else {
                 slide += 1;
                 user.emit("slide", slide);
+                spec.emit("slide", slide);
                 out("Went to the next slide (slide " + (slide + 1) + ").");
                 return;
             }
@@ -441,6 +446,7 @@ function executeCommand(command) {
             } else {
                 slide -= 1;
                 user.emit("slide", slide);
+                spec.emit("slide", slide);
                 out("Went to the previous slide (slide " + (slide + 1) + ").");
                 return;
             }
@@ -483,6 +489,28 @@ function executeCommand(command) {
                         return;
                     }
                 });
+
+                spec.sockets.forEach(socket => {
+                    if (socket.username == kick) {
+                        userFound = true;
+
+                        socket.emit("kicked");
+                        socket.disconnect(true);
+                        socket.authenticated = false;
+
+                        userAccounts = userAccounts.filter(account => account.username !== kick);
+                        connected = connected.filter(user => user !== kick);
+
+                        if (cmd.startsWith("ban")) {
+                            banned.push(kick);
+                            out(kick + " has been kicked and the usernamed has been banned.");
+                        }
+
+                        if (cmd.startsWith("kick")) out(kick + " has been kicked.");
+                        return;
+                    }
+                });
+
                 if (!userFound) out("An unrecognized error occurred.");
                 return;
             } else {
@@ -797,13 +825,20 @@ spec.use((socket, next) => {
 });
 
 spec.on("connect", socket => {
+    const username = specAccounts.find(ut => ut.token == socket.handshake.auth.token).username;
+    socket.username = username;
+
+    sout(username + " connected");
     specConnected++;
 
     socket.on("disconnect", () => {
+        sout(username + " disconnected");
         specConnected--;
     });
 
     // ---
+
+    socket.emit("slide", slide);
 });
 
 // NODE

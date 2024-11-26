@@ -5,10 +5,57 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>AppleDeck Presentation</title>
         <link rel="icon" type="image/x-png" href="logo" />
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                margin: 0;
+                overflow: hidden;
+                height: 100vh;
+                width: 100vw;
+                background-color: #141414;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-family: Roboto, Arial, Helvetica, sans-serif;
+            }
+
+            #container {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+                background-color: #141414;
+                position: relative;
+            }
+
+            #slide {
+                width: 1920px;
+                height: 1080px;
+                background-color: white;
+                transform-origin: center;
+                overflow: hidden;
+                position: absolute;
+            }
+        </style>
+        <link
+            href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark/dark.css"
+            rel="stylesheet" />
     </head>
     <body>
+        <div id="container">
+            <div id="slide"></div>
+        </div>
         <script src="/socket.io/socket.io.js"></script>
+        <script src="/renderer"></script>
         <script src="cookies"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+        <script src="/sweetalert"></script>
         <script>
             if (getCookie("spec") == null) window.location.href = "../join-spec";
 
@@ -21,6 +68,68 @@
             socket.on("connect_error", err => {
                 window.location.href = "../join-spec";
             });
+
+            socket.on("kicked", () => {
+                setCookie("user", "", -1);
+                window.location.href = "../join-spec";
+            });
+
+            let engine;
+            let slideshow;
+
+            const container = document.getElementById("container");
+            const slide = document.getElementById("slide");
+
+            function ajax(url) {
+                return new Promise(function (resolve, reject) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = function () {
+                        resolve(this.responseText);
+                    };
+                    xhr.onerror = reject;
+                    xhr.open("GET", url);
+                    xhr.send();
+                });
+            }
+
+            function resizeSlide() {
+                const containerWidth = container.clientWidth;
+                const containerHeight = container.clientHeight;
+
+                const targetAspectRatio = 1920 / 1080;
+                const containerAspectRatio = containerWidth / containerHeight;
+
+                let scale;
+
+                if (containerAspectRatio > targetAspectRatio) scale = containerHeight / 1080;
+                else scale = containerWidth / 1920;
+
+                slide.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                slide.style.position = "absolute";
+                slide.style.left = "50%";
+                slide.style.top = "50%";
+            }
+
+            ajax(`slideshow`)
+                .then(function (result) {
+                    engine = new RenderEngine(result);
+                    slideshow = engine.getSlideshow();
+                    resizeSlide();
+                })
+                .catch(function (e) {
+                    alert(e);
+                });
+
+            socket.on("slide", s => {
+                slide.innerHTML = "";
+                slide.append(engine.getSlide(s));
+            });
+
+            socket.on("slideshow updated", () => {
+                window.location.reload();
+            });
+
+            window.addEventListener("resize", resizeSlide);
         </script>
     </body>
 </html>

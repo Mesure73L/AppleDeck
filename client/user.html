@@ -134,13 +134,9 @@
                 const containerAspectRatio = containerWidth / containerHeight;
                 
                 let scale;
-                if (containerAspectRatio > targetAspectRatio) {
-                    // Container is wider than target ratio
-                    scale = containerHeight / 1080;
-                } else {
-                    // Container is taller than target ratio
-                    scale = containerWidth / 1920;
-                }
+                
+                if (containerAspectRatio > targetAspectRatio) scale = containerHeight / 1080;
+                else scale = containerWidth / 1920;
                 
                 slide.style.transform = `translate(-50%, -50%) scale(${scale})`;
                 slide.style.position = 'absolute';

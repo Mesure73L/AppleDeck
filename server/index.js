@@ -95,6 +95,8 @@ let slideshowUrl;
 let devmode = false;
 let devmodeConfirm;
 
+let inputs = {};
+
 function slideshowError(oldSlideshow, oldSlideshowRaw, oldSlideshowUrl) {
     out("Failed to start the slideshow.");
     out("This could be due to the URL being invalid or the file isn't in XML format.");
@@ -295,6 +297,49 @@ function executeCommand(command) {
                 );
                 return;
             }
+        }
+    }
+
+    // input ...
+    else if (command.startsWith("input")) {
+        const cmd = command.substring(5).trim();
+
+        // input delete ...
+        if (cmd.startsWith("delete")) {
+            const input = cmd.substring(6).trim().split(" ");
+            const id = input[0];
+
+            let username = "";
+            for (let i = 1; i < input.length; i++) {
+                username += input[i];
+                if (i != input.length - 1) username += " ";
+            }
+
+            if (inputs[id] == undefined) return out("That input does not exist.");
+            if (inputs[id][username] == undefined)
+                return out("That user did not complete that input.");
+
+            delete inputs[id][username];
+            out("Deleted the input " + id + " from " + username + ".");
+            return;
+        }
+
+        // input get ...
+        if (cmd.startsWith("get")) {
+            const input = cmd.substring(3).trim().split(" ");
+            const id = input[0];
+
+            let username = "";
+            for (let i = 1; i < input.length; i++) {
+                username += input[i];
+                if (i != input.length - 1) username += " ";
+            }
+
+            if (inputs[id] == undefined) return out("That input does not exist.");
+            if (inputs[id][username] == undefined)
+                return out("That user did not complete that input.");
+
+            return out(inputs[id][username]);
         }
     }
 
@@ -766,6 +811,9 @@ user.on("connect", socket => {
 
     socket.on("interactive - input", input => {
         uout(username + " sent input: " + input.value + " (ID: " + input.id + ")");
+
+        if (inputs[input.id] == undefined) inputs[input.id] = {};
+        inputs[input.id][username] = input.value == "" ? null : input.value;
     });
 });
 

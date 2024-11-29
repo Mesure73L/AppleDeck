@@ -103,6 +103,9 @@
             let engine;
             let slideshow;
 
+            let engineLoaded = false;
+            let slideLoaded = false;
+
             const container = document.getElementById("container");
             const slide = document.getElementById("slide");
             const responses = document.getElementById("responses-input");
@@ -140,8 +143,10 @@
             ajax(`slideshow`)
                 .then(function (result) {
                     engine = new RenderEngine(result, "spec");
+                    engineLoaded = true;
                     slideshow = engine.getSlideshow();
                     resizeSlide();
+                    if (slideLoaded) slide.append(engine.getSlide(slideLoaded));
                 })
                 .catch(function (e) {
                     alert(e);
@@ -149,7 +154,9 @@
 
             socket.on("slide", s => {
                 slide.innerHTML = "";
-                slide.append(engine.getSlide(s));
+                slideLoaded = true;
+                if (engineLoaded) slide.append(engine.getSlide(s));
+                else slideLoaded = s;
             });
 
             socket.on("slideshow updated", () => {

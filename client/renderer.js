@@ -319,8 +319,7 @@ class RenderEngine {
                     }`;
 
                     if (this.type != "user") {
-                        element.disabled = true;
-                        element.style.cursor = "not-allowed";
+                        element.style.cursor = "pointer";
                         element.style.fontFamily = e.disabled.fontFamily;
                         element.style.fontSize = e.disabled.fontSize + "px";
                         element.placeholder = e.disabled.text;
@@ -328,6 +327,12 @@ class RenderEngine {
                         element.style.outline = "none";
                         element.style.border = `${e.disabled.border.size}px ${e.disabled.border.style} ${e.disabled.border.color}`;
                         element.style.textAlign = e.disabled.textAlign;
+                        element.addEventListener("mousedown", event => {
+                            event.preventDefault();
+                            console.log("input clicked");
+                            showResponses(e.id);
+                            console.log(e.id);
+                        });
                         document.getElementById("slide-style").innerText = `
                         .${uniqueClass}::placeholder {
                             color: ${e.disabled.color};

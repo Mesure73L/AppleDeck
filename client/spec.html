@@ -59,6 +59,45 @@
                 top: 17.5px;
                 left: 60px;
             }
+
+            .input-response {
+                background-color: #1e1e1e;
+                border-radius: 12px;
+                padding: 20px;
+                color: white;
+                width: 80dvw;
+                max-width: 800px;
+                margin-left: auto;
+                margin-right: auto;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                line-height: 1.6;
+            }
+            .input-response + .input-response {
+                margin-top: 20px;
+            }
+
+            #responses-input {
+                max-height: calc(100vh - 20px);
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding: 10px;
+                height: calc(100vh - 80px);
+                &::-webkit-scrollbar {
+                    width: 8px;
+                }
+                &::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                &::-webkit-scrollbar-thumb {
+                    background-color: rgba(255, 255, 255, 0.2);
+                    border-radius: 4px;
+                }
+                &::-webkit-scrollbar-thumb:hover {
+                    background-color: rgba(255, 255, 255, 0.3);
+                }
+                position: absolute;
+                bottom: 0;
+            }
         </style>
         <style id="slide-style"></style>
         <link
@@ -73,7 +112,61 @@
         <div id="responses-input" style="display: none">
             <i class="back-arrow fa-solid fa-arrow-left"></i>
             <p class="nav-desc">Responses for input "???"</p>
-            <div class="response"></div>
+            <div class="input-response">
+                <p>
+                    Lorem ipsum odor amet, consectetuer adipiscing elit. Aenean faucibus ullamcorper
+                    rhoncus mi ligula. Volutpat lobortis vel augue id quam porttitor. Nullam
+                    placerat lectus dignissim quisque tempor ultricies ut. Laoreet donec fames class
+                    eget finibus faucibus conubia scelerisque. Cras elementum enim et aenean commodo
+                    potenti cubilia tincidunt. Fermentum felis id natoque at id. Fringilla ornare
+                    tempus taciti pellentesque dapibus hac id cubilia. Purus quisque leo eros tempus
+                    posuere eget nostra enim. Magna mi netus sem lobortis maximus lectus integer.
+                </p>
+            </div>
+            <div class="input-response">
+                <p>
+                    Lorem ipsum odor amet, consectetuer adipiscing elit. Aenean faucibus ullamcorper
+                    rhoncus mi ligula. Volutpat lobortis vel augue id quam porttitor. Nullam
+                    placerat lectus dignissim quisque tempor ultricies ut. Laoreet donec fames class
+                    eget finibus faucibus conubia scelerisque. Cras elementum enim et aenean commodo
+                    potenti cubilia tincidunt. Fermentum felis id natoque at id. Fringilla ornare
+                    tempus taciti pellentesque dapibus hac id cubilia. Purus quisque leo eros tempus
+                    posuere eget nostra enim. Magna mi netus sem lobortis maximus lectus integer.
+                </p>
+            </div>
+            <div class="input-response">
+                <p>
+                    Lorem ipsum odor amet, consectetuer adipiscing elit. Aenean faucibus ullamcorper
+                    rhoncus mi ligula. Volutpat lobortis vel augue id quam porttitor. Nullam
+                    placerat lectus dignissim quisque tempor ultricies ut. Laoreet donec fames class
+                    eget finibus faucibus conubia scelerisque. Cras elementum enim et aenean commodo
+                    potenti cubilia tincidunt. Fermentum felis id natoque at id. Fringilla ornare
+                    tempus taciti pellentesque dapibus hac id cubilia. Purus quisque leo eros tempus
+                    posuere eget nostra enim. Magna mi netus sem lobortis maximus lectus integer.
+                </p>
+            </div>
+            <div class="input-response">
+                <p>
+                    Lorem ipsum odor amet, consectetuer adipiscing elit. Aenean faucibus ullamcorper
+                    rhoncus mi ligula. Volutpat lobortis vel augue id quam porttitor. Nullam
+                    placerat lectus dignissim quisque tempor ultricies ut. Laoreet donec fames class
+                    eget finibus faucibus conubia scelerisque. Cras elementum enim et aenean commodo
+                    potenti cubilia tincidunt. Fermentum felis id natoque at id. Fringilla ornare
+                    tempus taciti pellentesque dapibus hac id cubilia. Purus quisque leo eros tempus
+                    posuere eget nostra enim. Magna mi netus sem lobortis maximus lectus integer.
+                </p>
+            </div>
+            <div class="input-response">
+                <p>
+                    Lorem ipsum odor amet, consectetuer adipiscing elit. Aenean faucibus ullamcorper
+                    rhoncus mi ligula. Volutpat lobortis vel augue id quam porttitor. Nullam
+                    placerat lectus dignissim quisque tempor ultricies ut. Laoreet donec fames class
+                    eget finibus faucibus conubia scelerisque. Cras elementum enim et aenean commodo
+                    potenti cubilia tincidunt. Fermentum felis id natoque at id. Fringilla ornare
+                    tempus taciti pellentesque dapibus hac id cubilia. Purus quisque leo eros tempus
+                    posuere eget nostra enim. Magna mi netus sem lobortis maximus lectus integer.
+                </p>
+            </div>
         </div>
 
         <script src="/socket.io/socket.io.js"></script>
@@ -166,7 +259,9 @@
             function showResponses(id) {
                 container.style.display = "none";
                 responses.style.display = "block";
-                document.getElementById("nav-desc").innerText = `Responses for input "${id}"`;
+                document.querySelector(
+                    "#responses-input .nav-desc"
+                ).innerText = `Responses for input "${id}"`;
             }
 
             document.querySelector("#responses-input .back-arrow").addEventListener("click", () => {

@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>AppleDeck Console</title>
         <link rel="icon" type="image/x-png" href="logo" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <style>
             #console,
             #output {
@@ -136,7 +137,7 @@
         <script src="cookies"></script>
         <script>
             if (getCookie("node") == null) window.location.href = "../join-node";
-            
+
             const socket = io("/node", {
                 auth: {
                     token: getCookie("node").token
@@ -147,79 +148,41 @@
                 window.location.href = "../join-node";
             });
 
-            const input = document.getElementById("input");
-            const output = document.getElementById("output");
+            const input = $("#input");
+            const output = $("#output");
 
             function addLine(line) {
-                const element = document.createElement("p");
-                const type = document.createElement("span");
-                const log = document.createElement("span");
+                const element = $("<p>");
+                const typeElement = $("<span>");
+                const log = $("<span>");
 
-                // CLNT
-                if (line.startsWith("[CLNT] ")) {
-                    line = line.replace("[CLNT] ", "");
-                    type.innerText = "[CLNT] ";
-                    type.classList.add("clnt");
-                }
+                const types = ["CLNT", "JOIN", "USER", "HOST", "SPEC", "NODE", "admin@appledeck"];
+                types.forEach(type => {
+                    const prefix = type === "admin@appledeck" ? `${type} $ ` : `[${type}] `;
+                    if (line.startsWith(prefix)) {
+                        line = line.replace(prefix, "");
+                        typeElement.text(prefix);
+                        typeElement.addClass(type.toLowerCase().replace("@", "").replace("$", ""));
+                    }
+                });
 
-                // JOIN
-                else if (line.startsWith("[JOIN] ")) {
-                    line = line.replace("[JOIN] ", "");
-                    type.innerText = "[JOIN] ";
-                    type.classList.add("join");
-                }
+                log.text(line);
 
-                // USER
-                else if (line.startsWith("[USER] ")) {
-                    line = line.replace("[USER] ", "");
-                    type.innerText = "[USER] ";
-                    type.classList.add("user");
-                }
-
-                // HOST
-                else if (line.startsWith("[HOST] ")) {
-                    line = line.replace("[HOST] ", "");
-                    type.innerText = "[HOST] ";
-                    type.classList.add("host");
-                }
-
-                // SPEC
-                else if (line.startsWith("[SPEC] ")) {
-                    line = line.replace("[SPEC] ", "");
-                    type.innerText = "[SPEC] ";
-                    type.classList.add("spec");
-                }
-
-                // NODE
-                else if (line.startsWith("[NODE] ")) {
-                    line = line.replace("[NODE] ", "");
-                    type.innerText = "[NODE] ";
-                    type.classList.add("node");
-                }
-
-                // ADMIN@APPLEDECK
-                else if (line.startsWith("admin@AppleDeck $ ")) {
-                    line = line.replace("admin@AppleDeck $ ", "");
-                    type.innerText = "admin@AppleDeck $ ";
-                    type.classList.add("admin");
-                }
-
-                log.innerText = line;
-
-                element.append(type);
+                element.append(typeElement);
                 element.append(log);
-                
-                const wasAtBottom = output.scrollHeight - output.clientHeight - output.scrollTop < 2;
-                
+
+                const wasAtBottom =
+                    output.scrollHeight - output.clientHeight - output.scrollTop < 2;
+
                 output.append(element);
-                
+
                 if (wasAtBottom) {
                     output.scrollTop = output.scrollHeight;
                 }
             }
 
             socket.on("history", history => {
-                output.innerHTML = "";
+                output.empty();
                 for (i = 0; i < history.length; i++) {
                     addLine(history[i]);
                 }
@@ -230,12 +193,12 @@
                 addLine(line);
             });
 
-            input.addEventListener("keydown", e => {
+            input.keydown(e => {
                 if (e.key == "Enter" || e.keyCode == 13) {
-                    if (input.value.trim() != "") {
-                        addLine("admin@AppleDeck $ " + input.value.trim());
-                        socket.emit("command", input.value.trim());
-                        input.value = "";
+                    if (input.val().trim() != "") {
+                        addLine("admin@AppleDeck $ " + input.val().trim());
+                        socket.emit("command", input.val().trim());
+                        input.val("");
                     }
                 }
             });

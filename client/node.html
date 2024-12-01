@@ -5,55 +5,68 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>AppleDeck Console</title>
         <link rel="icon" type="image/x-png" href="logo" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
         <style>
-            #console,
-            #output {
-                overflow-y: scroll;
+            * {
+                box-sizing: border-box;
+            }
+
+            .console,
+            .output {
+                overflow-y: auto;
                 scrollbar-width: none;
                 -ms-overflow-style: none;
-                &::-webkit-scrollbar {
-                    display: none;
-                }
+            }
+            .console::-webkit-scrollbar,
+            .output::-webkit-scrollbar {
+                display: none;
             }
 
             body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
                 background-color: #1e1e1e;
                 font-family: monospace;
                 overflow: hidden;
                 font-size: 14px;
+                padding: 50px;
             }
 
-            #console {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: calc(100dvw - 100px);
-                height: calc(100dvh - 100px);
+            .console {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                height: 100%;
                 padding: 10px;
-                overflow-y: scroll;
                 background-color: #141414;
                 color: #fff;
             }
 
-            #console p {
+            .console p {
                 margin: 0;
                 padding: 0;
             }
 
-            #output {
-                height: calc(100% - 30px);
-                position: relative;
-                overflow-y: scroll;
-                top: 0;
+            .output {
+                flex: 1;
+                color: #ccc;
+            }
+
+            .input-container {
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                padding: 10px;
             }
 
             .cmd {
                 color: #66cc00;
-            }
-
-            .output {
-                color: #ccc;
             }
 
             .error {
@@ -92,9 +105,9 @@
                 color: #b91515;
             }
 
-            #input {
+            .input {
                 margin-left: 10px;
-                width: 100%;
+                flex-grow: 1;
                 height: 20px;
                 padding: 0;
                 border: none;
@@ -103,40 +116,81 @@
                 font-size: 14px;
                 background-color: transparent;
                 color: #fff;
+                border-bottom: 1px solid #fff;
             }
 
-            #input:focus {
+            .input:focus {
                 outline: none;
             }
 
-            .input-container {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                position: relative;
-                bottom: -7px;
-                width: calc(100% - 20px);
+            .send-btn {
+                background-color: transparent;
+                color: lightblue;
+                border: none;
+                cursor: pointer;
+                margin-left: 10px;
+                font-size: 18px;
+                transition: color 0.3s;
             }
 
-            .input-container label {
-                white-space: nowrap;
+            .send-btn:hover {
+                color: #007bff;
+            }
+
+            .tooltip {
+                position: relative;
+                display: inline-block;
+            }
+
+            .tooltip .tooltiptext {
+                visibility: hidden;
+                width: 120px;
+                background-color: #555;
+                color: #fff;
+                text-align: center;
+                border-radius: 5px;
+                padding: 5px;
+                position: absolute;
+                z-index: 1;
+                bottom: 125%;
+                left: 50%;
+                transform: translateX(-50%);
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .tooltip:hover .tooltiptext {
+                visibility: visible;
+                opacity: 1;
+            }
+
+            .tooltip:hover .tooltiptext {
+                left: auto;
+                right: 0;
+                transform: translateX(0);
             }
         </style>
     </head>
     <body>
-        <div id="console">
-            <div id="output"></div>
+        <main id="console" class="console" aria-live="polite">
+            <div id="output" class="output"></div>
             <div class="input-container">
                 <label for="input" class="prompt">admin@AppleDeck $</label>
-                <input id="input" type="text" />
+                <input id="input" class="input" type="text" />
+                <div class="tooltip">
+                    <button id="sendBtn" class="send-btn" aria-label="Send Command" type="button">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                    <span class="tooltiptext">Send Command</span>
+                </div>
             </div>
-        </div>
+        </main>
 
         <script src="/socket.io/socket.io.js"></script>
         <script src="cookies"></script>
         <script>
             if (getCookie("node") == null) window.location.href = "../join-node";
-            
+
             const socket = io("/node", {
                 auth: {
                     token: getCookie("node").token
@@ -147,79 +201,43 @@
                 window.location.href = "../join-node";
             });
 
-            const input = document.getElementById("input");
-            const output = document.getElementById("output");
+            const input = $("#input");
+            const output = $("#output");
 
             function addLine(line) {
-                const element = document.createElement("p");
-                const type = document.createElement("span");
-                const log = document.createElement("span");
+                const element = $("<p>");
+                const typeElement = $("<span>");
+                const log = $("<span>");
 
-                // CLNT
-                if (line.startsWith("[CLNT] ")) {
-                    line = line.replace("[CLNT] ", "");
-                    type.innerText = "[CLNT] ";
-                    type.classList.add("clnt");
-                }
+                const types = ["CLNT", "JOIN", "USER", "HOST", "SPEC", "NODE", "admin@appledeck"];
+                types.forEach(type => {
+                    const prefix = type === "admin@appledeck" ? "admin@AppleDeck $ " : `[${type}] `;
+                    if (line.startsWith(prefix)) {
+                        line = line.replace(prefix, "");
+                        typeElement.text(prefix);
+                        typeElement.addClass(
+                            type === "admin@appledeck" ? "admin" : type.toLowerCase()
+                        );
+                    }
+                });
 
-                // JOIN
-                else if (line.startsWith("[JOIN] ")) {
-                    line = line.replace("[JOIN] ", "");
-                    type.innerText = "[JOIN] ";
-                    type.classList.add("join");
-                }
+                log.text(line);
 
-                // USER
-                else if (line.startsWith("[USER] ")) {
-                    line = line.replace("[USER] ", "");
-                    type.innerText = "[USER] ";
-                    type.classList.add("user");
-                }
-
-                // HOST
-                else if (line.startsWith("[HOST] ")) {
-                    line = line.replace("[HOST] ", "");
-                    type.innerText = "[HOST] ";
-                    type.classList.add("host");
-                }
-
-                // SPEC
-                else if (line.startsWith("[SPEC] ")) {
-                    line = line.replace("[SPEC] ", "");
-                    type.innerText = "[SPEC] ";
-                    type.classList.add("spec");
-                }
-
-                // NODE
-                else if (line.startsWith("[NODE] ")) {
-                    line = line.replace("[NODE] ", "");
-                    type.innerText = "[NODE] ";
-                    type.classList.add("node");
-                }
-
-                // ADMIN@APPLEDECK
-                else if (line.startsWith("admin@AppleDeck $ ")) {
-                    line = line.replace("admin@AppleDeck $ ", "");
-                    type.innerText = "admin@AppleDeck $ ";
-                    type.classList.add("admin");
-                }
-
-                log.innerText = line;
-
-                element.append(type);
+                element.append(typeElement);
                 element.append(log);
-                
-                const wasAtBottom = output.scrollHeight - output.clientHeight - output.scrollTop < 2;
-                
+
+                const wasAtBottom =
+                    output.scrollHeight - output.clientHeight - output.scrollTop < 2;
+
                 output.append(element);
-                
+
                 if (wasAtBottom) {
                     output.scrollTop = output.scrollHeight;
                 }
             }
 
             socket.on("history", history => {
-                output.innerHTML = "";
+                output.empty();
                 for (i = 0; i < history.length; i++) {
                     addLine(history[i]);
                 }
@@ -230,15 +248,24 @@
                 addLine(line);
             });
 
-            input.addEventListener("keydown", e => {
+            input.keydown(e => {
                 if (e.key == "Enter" || e.keyCode == 13) {
-                    if (input.value.trim() != "") {
-                        addLine("admin@AppleDeck $ " + input.value.trim());
-                        socket.emit("command", input.value.trim());
-                        input.value = "";
-                    }
+                    send();
                 }
             });
+
+            $("#sendBtn").click(send);
+
+            function send() {
+                const command = input.val().trim();
+                if (command === "") {
+                    alert("Please enter a command.");
+                    return;
+                }
+                addLine("admin@AppleDeck $ " + command);
+                socket.emit("command", command);
+                input.val("");
+            }
         </script>
     </body>
 </html>

@@ -887,6 +887,11 @@ spec.on("connect", socket => {
     // ---
 
     socket.emit("slide", slide);
+
+    socket.on("get input", id => {
+        if (inputs[id] == undefined) return;
+        socket.emit("input responses", inputs[id]);
+    });
 });
 
 // NODE

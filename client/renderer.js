@@ -329,9 +329,7 @@ class RenderEngine {
                         element.style.textAlign = e.disabled.textAlign;
                         element.addEventListener("mousedown", event => {
                             event.preventDefault();
-                            console.log("input clicked");
                             showResponses(e.id);
-                            console.log(e.id);
                         });
                         document.getElementById("slide-style").innerText = `
                         .${uniqueClass}::placeholder {
@@ -346,6 +344,10 @@ class RenderEngine {
                         .${uniqueClass}::-ms-input-placeholder {
                             color: ${e.disabled.color};
                         }`;
+
+                        inputInterval = setInterval(function () {
+                            socket.emit("get input", e.id);
+                        }, 5000);
                     }
 
                     let debounceTimer;

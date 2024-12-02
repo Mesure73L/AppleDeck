@@ -150,7 +150,7 @@
 
             ajax(`slideshow`)
                 .then(function (result) {
-                    engine = new RenderEngine(result, "spec");
+                    engine = new RenderEngine(result, "user");
                     engineLoaded = true;
                     slideshow = engine.getSlideshow();
                     resizeSlide();

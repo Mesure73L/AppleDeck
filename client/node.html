@@ -227,12 +227,15 @@
                 element.append(log);
 
                 const wasAtBottom =
-                    output.scrollHeight - output.clientHeight - output.scrollTop < 2;
+                    output.prop("scrollHeight") -
+                        output.prop("clientHeight") -
+                        output.prop("scrollTop") <
+                    2;
 
                 output.append(element);
 
                 if (wasAtBottom) {
-                    output.scrollTop = output.scrollHeight;
+                    output.prop("scrollTop", output.prop("scrollHeight"));
                 }
             }
 

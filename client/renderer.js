@@ -347,7 +347,7 @@ class RenderEngine {
 
                         inputInterval = setInterval(function () {
                             socket.emit("get input", e.id);
-                        }, 5000);
+                        }, 2000);
                     }
 
                     let debounceTimer;

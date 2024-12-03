@@ -220,6 +220,7 @@
                 responsesContainer.innerHTML = "";
                 for (let username in r) {
                     if (r.hasOwnProperty(username)) {
+                        if (r[username] == null) return;
                         const div = document.createElement("div");
                         const p = document.createElement("p");
                         div.classList.add("input-response");

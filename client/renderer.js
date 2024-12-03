@@ -298,6 +298,7 @@ class RenderEngine {
                     element.style.rotate = e.position.rotation + "deg";
                     element.style.textAlign = e.textAlign;
                     element.style.setProperty("--placeholder-color", e.placeholder.color);
+                    element.maxLength = 2048;
 
                     const uniqueClass = "input-" + Math.random().toString(36).substring(2, 9);
                     element.classList.add(uniqueClass);

@@ -810,6 +810,7 @@ user.on("connect", socket => {
     socket.emit("slide", slide);
 
     socket.on("interactive - input", input => {
+        if (input.length > 2048) return;
         if (inputs[input.id] == undefined) inputs[input.id] = {};
         inputs[input.id][username] = input.value == "" ? null : input.value;
     });

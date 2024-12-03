@@ -220,7 +220,7 @@
                 responsesContainer.innerHTML = "";
                 for (let username in r) {
                     if (r.hasOwnProperty(username)) {
-                        if (r[username] == null) return;
+                        if (r[username] == null) break;
                         const div = document.createElement("div");
                         const p = document.createElement("p");
                         div.classList.add("input-response");
@@ -228,6 +228,13 @@
                         div.append(p);
                         responsesContainer.append(div);
                     }
+                }
+                if (responsesContainer.innerHTML == "") {
+                    const p = document.createElement("p");
+                    p.innerText = "No responses yet.";
+                    p.style.color = "white";
+                    p.style.fontStyle = "italic";
+                    responsesContainer.append(p);
                 }
             });
 

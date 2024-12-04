@@ -40,7 +40,7 @@
   
   <p>A free and open source PearDeck alternative</p>
 
-<a href="https://github.com/Mesure73L/AppleDeck/wiki">View Docs</a>
+<a href="https://appledeck.gitbook.io/docs">View Docs</a>
 ·
 <a href="https://github.com/Mesure73L/AppleDeck/issues/new?assignees=&labels=prob.-PROBLEM%2C+prob.bug&projects=&template=bug_report.md&title=%5BBUG%5D+">Report Bug</a>
 ·

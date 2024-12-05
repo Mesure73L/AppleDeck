@@ -163,6 +163,11 @@ function log(message) {
     console.log(message);
 }
 
+function post(message) {
+    console.log(message);
+    history.push(message);
+}
+
 function generateToken() {
     let token = "";
 
@@ -934,7 +939,7 @@ node.on("connect", socket => {
     socket.emit("history", history);
 
     socket.on("command", command => {
-        log("admin@AppleDeck $ " + command);
+        post("admin@AppleDeck $ " + command);
 
         executeCommand(command);
     });

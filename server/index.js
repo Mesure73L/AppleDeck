@@ -1,23 +1,8 @@
 // CONFIG
 
-// allow toasts? must be false if app is hosted on the following tlds:
-// .ru  .su  .by  .рф
-// more information is in CONFIG_OPTIONS.md.
-const allowToasts = true;
+const Utils = require("./utils"); // Import the Utils class
 
-// the url to a slideshow to try and start with
-// no slideshow will be started if left blank
-const startingSlideshow = "";
-
-// default allowlist, can be changed later in the console
-let allowlist = false;
-let allowed = [];
-
-// default denylist, can be changed later in the console
-let banned = [];
-
-// the port that the server will be listening on
-const clntPort = 3000;
+const config = Utils.loadConfig("config.json"); // Load the config options
 
 // prefixes for logging to the console
 const clntPrefix = "[CLNT] ";
@@ -44,9 +29,7 @@ const express = require("express");
 const app = express();
 const http = require("http");
 const server = http.createServer(app);
-const {Server} = require("socket.io");
-const {isBooleanObject} = require("util/types");
-const io = new Server(server);
+const io = require("socket.io")(server);
 const dir = __dirname.replace("server", "client");
 
 const join = io.of(joinNamespace);
@@ -58,12 +41,12 @@ const node = io.of(nodeNamespace);
 // SETUP VARIABLES, FUNCTIONS, AND OTHER LIBRARIES
 
 const fs = require("fs");
-const {profanity, CensorType} = require("@2toad/profanity");
+const profanity = require("@2toad/profanity");
 const xml2js = require("xml2js");
 const axios = require("axios");
 
 async function xmlToJson(xmlString) {
-    const parser = new xml2js.Parser({explicitArray: false});
+    const parser = new Parser({explicitArray: false});
     return new Promise((resolve, reject) => {
         parser.parseString(xmlString, (err, result) => {
             if (err) {
@@ -113,8 +96,7 @@ function setSlideshow(url) {
     slideshowUrl = url;
 
     if (url.startsWith("http://") || url.startsWith("https://")) {
-        axios
-            .get(url)
+        get(url)
             .then(response => {
                 processSlideshowData(response.data);
             })
@@ -122,7 +104,7 @@ function setSlideshow(url) {
                 return slideshowError(oldSlideshow, oldSlideshowRaw, oldSlideshowUrl);
             });
     } else {
-        fs.readFile(dir + "/" + url, async (err, data) => {
+        readFile(dir + "/" + url, async (err, data) => {
             if (err) return slideshowError(oldSlideshow, oldSlideshowRaw, oldSlideshowUrl);
             processSlideshowData(
                 data.toString("utf8"),
@@ -149,8 +131,8 @@ async function processSlideshowData(data, oldSlideshow, oldSlideshowRaw, oldSlid
     }
 }
 
-if (!startingSlideshow == "") {
-    setSlideshow(startingSlideshow);
+if (!config.startingSlideshow == "") {
+    setSlideshow(config.startingSlideshow);
 }
 
 function out(message) {
@@ -210,41 +192,41 @@ function executeCommand(command) {
 
             if (add == "" || add == undefined) return out("Username must be specified.");
 
-            if (allowed.includes(add)) return out("That username is already allowed.");
+            if (config.allowed.includes(add)) return out("That username is already allowed.");
 
-            allowed.push(add);
+            config.allowed.push(add);
             out(add + " has been added to the allowlist.");
             return;
         }
 
         // allowlist disable
         if (cmd == "disable") {
-            if (!allowlist) return out("Allowlist was already disabled.");
-            allowlist = false;
+            if (!config.allowList) return out("Allowlist was already disabled.");
+            config.allowList = false;
             out("Disabled the allowlist.");
             return;
         }
 
         // allowlist enable
         if (cmd == "enable") {
-            if (allowlist) return out("Allowlist was already enabled.");
-            allowlist = true;
+            if (config.allowList) return out("Allowlist was already enabled.");
+            config.allowList = true;
             out("Enabled the allowlist.");
             return;
         }
 
         // allowlist list
         if (cmd == "list") {
-            if (!allowlist) {
+            if (!config.allowList) {
                 out("The allowlist is currently disabled.");
                 out("However, the following usernames are allowed:");
             } else {
                 out("The following usernames are allowed:");
             }
 
-            if (allowed.length == 0) return out("The allowlist is empty.");
+            if (config.allowed.length == 0) return out("The allowlist is empty.");
 
-            allowed.forEach(user => {
+            config.allowed.forEach(user => {
                 out(" - " + user);
             });
             return;
@@ -256,9 +238,9 @@ function executeCommand(command) {
 
             if (remove == "" || remove == undefined) return out("Username must be specified.");
 
-            if (!allowed.includes(remove)) return out("That username was not allowed.");
+            if (!config.allowed.includes(remove)) return out("That username was not allowed.");
 
-            allowed = allowed.filter(user => user !== remove);
+            config.allowed = config.allowed.filter(user => user !== remove);
             out(remove + " has been removed from the allowlist.");
             return;
         }
@@ -531,7 +513,7 @@ function executeCommand(command) {
                         connected = connected.filter(user => user !== kick);
 
                         if (cmd.startsWith("ban")) {
-                            banned.push(kick);
+                            config.banned.push(kick);
                             out(kick + " has been kicked and the usernamed has been banned.");
                         }
 
@@ -552,7 +534,7 @@ function executeCommand(command) {
                         connected = connected.filter(user => user !== kick);
 
                         if (cmd.startsWith("ban")) {
-                            banned.push(kick);
+                            config.banned.push(kick);
                             out(kick + " has been kicked and the usernamed has been banned.");
                         }
 
@@ -564,7 +546,7 @@ function executeCommand(command) {
                 if (!userFound) out("An unrecognized error occurred.");
                 return;
             } else {
-                banned.push(kick);
+                config.banned.push(kick);
                 out(kick + " was not found, but the username was banned.");
                 return;
             }
@@ -576,8 +558,8 @@ function executeCommand(command) {
 
             if (unban == "" || unban == undefined) return out("Username must be specified.");
 
-            if (banned.includes(unban)) {
-                banned = banned.filter(user => user !== unban);
+            if (config.banned.includes(unban)) {
+                config.banned = config.banned.filter(user => user !== unban);
                 out(unban + " has been unbanned.");
                 return;
             }
@@ -620,7 +602,7 @@ app.get("/renderer", (req, res) => {
 });
 
 app.get("/sweetalert", (req, res) => {
-    if (!allowToasts) return res.send("");
+    if (!config.allowToasts) return res.send("");
     res.redirect("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js");
 });
 
@@ -684,7 +666,7 @@ join.on("connect", socket => {
             }
 
             // name is not approved
-            if (allowlist && !allowed.includes(username)) {
+            if (config.allowList && !config.allowed.includes(username)) {
                 jout(username + " was denied: name is not approved");
                 return socket.emit("user approval", {
                     permission: false,
@@ -693,7 +675,7 @@ join.on("connect", socket => {
             }
 
             // name is banned
-            if (banned.includes(username)) {
+            if (config.banned.includes(username)) {
                 jout(username + " was denied: name is banned");
                 return socket.emit("user approval", {
                     permission: false,
@@ -947,6 +929,6 @@ node.on("connect", socket => {
 
 // START SERVERS
 
-server.listen(clntPort, () => {
-    cout(`listening on *:${clntPort}`);
+server.listen(config.clntPort, () => {
+    cout(`listening on *:${config.clntPort}`);
 });

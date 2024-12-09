@@ -101,80 +101,82 @@ class RenderEngine {
                     });
 
                     html.append(element);
-                } else if (e.template == "HTML") {
-                    try {
-                        const element = document.createElement("p");
-                        element.innerHTML = e.text.replaceAll("\\n", "<br>");
-                        element.style.color = e.color;
-                        element.style.fontFamily = e.fontFamily;
-                        element.style.fontSize = e.fontSize + "px";
-                        element.style.position = "absolute";
-                        element.style.rotate = e.position.rotation + "deg";
-                        element.style.whiteSpace = "nowrap";
-                        element.style.textAlign = e.textAlign;
+                }
 
-                        if (e.position.x == "Center") {
-                            element.style.left = "50%";
-                            element.style.transform = "translateX(-50%)";
-                        } else if (e.position.x.startsWith("-")) {
-                            element.style.right = e.position.x.substring(1) + "px";
-                        } else {
-                            element.style.left = e.position.x + "px";
-                        }
+                // html
+                else if (e.template == "HTML") {
+                    const element = document.createElement("p");
+                    element.innerHTML = e.text
+                        .replaceAll("\\n", "<br>")
+                        .replaceAll("[", "<")
+                        .replaceAll("]", ">");
+                    element.style.color = e.color;
+                    element.style.fontFamily = e.fontFamily;
+                    element.style.fontSize = e.fontSize + "px";
+                    element.style.position = "absolute";
+                    element.style.rotate = e.position.rotation + "deg";
+                    element.style.whiteSpace = "nowrap";
+                    element.style.textAlign = e.textAlign;
 
-                        if (e.position.y == "Center") {
-                            element.style.top = "50%";
-                            element.style.transform = "translateY(-50%)";
-                        } else if (e.position.y.startsWith("-")) {
-                            element.style.bottom = e.position.y.substring(1) + "px";
-                        } else {
-                            element.style.top = e.position.y + "px";
-                        }
-
-                        if (e.position.x == "Center" && e.position.y == "Center") {
-                            element.style.transform = "translate(-50%, -50%)";
-                        }
-
-                        if (e.position.origin != null) {
-                            const originY = e.position.origin.split("-")[0];
-                            const originX = e.position.origin.split("-")[1];
-                            element.style.transformOrigin = originX + " " + originY;
-
-                            let transforms = [];
-
-                            if (e.position.x.startsWith("-")) {
-                                if (originX == "center") transforms.push("translateX(50%)");
-                                else if (originX == "left") transforms.push("translateX(100%)");
-                            } else {
-                                if (originX == "center") transforms.push("translateX(-50%)");
-                                else if (originX == "right") transforms.push("translateX(-100%)");
-                            }
-
-                            if (e.position.y.startsWith("-")) {
-                                if (originY == "center") transforms.push("translateY(25%)");
-                                else if (originY == "top") transforms.push("translateY(100%)");
-                            } else {
-                                if (originY == "center") transforms.push("translateY(-50%)");
-                                else if (originY == "bottom") transforms.push("translateY(-100%)");
-                            }
-
-                            if (e.position.rotation) {
-                                transforms.push(`rotate(${e.position.rotation}deg)`);
-                            }
-
-                            element.style.transform = transforms.join(" ");
-                        }
-
-                        WebFont.load({
-                            google: {
-                                families: [e.fontFamily]
-                            }
-                        });
-
-                        html.append(element);
-                    } catch (e) {
-                        alert(e);
+                    if (e.position.x == "Center") {
+                        element.style.left = "50%";
+                        element.style.transform = "translateX(-50%)";
+                    } else if (e.position.x.startsWith("-")) {
+                        element.style.right = e.position.x.substring(1) + "px";
+                    } else {
+                        element.style.left = e.position.x + "px";
                     }
+
+                    if (e.position.y == "Center") {
+                        element.style.top = "50%";
+                        element.style.transform = "translateY(-50%)";
+                    } else if (e.position.y.startsWith("-")) {
+                        element.style.bottom = e.position.y.substring(1) + "px";
+                    } else {
+                        element.style.top = e.position.y + "px";
+                    }
+
+                    if (e.position.x == "Center" && e.position.y == "Center") {
+                        element.style.transform = "translate(-50%, -50%)";
+                    }
+
+                    if (e.position.origin != null) {
+                        const originY = e.position.origin.split("-")[0];
+                        const originX = e.position.origin.split("-")[1];
+                        element.style.transformOrigin = originX + " " + originY;
+
+                        let transforms = [];
+
+                        if (e.position.x.startsWith("-")) {
+                            if (originX == "center") transforms.push("translateX(50%)");
+                            else if (originX == "left") transforms.push("translateX(100%)");
+                        } else {
+                            if (originX == "center") transforms.push("translateX(-50%)");
+                            else if (originX == "right") transforms.push("translateX(-100%)");
+                        }
+
+                        if (e.position.y.startsWith("-")) {
+                            if (originY == "center") transforms.push("translateY(25%)");
+                            else if (originY == "top") transforms.push("translateY(100%)");
+                        } else {
+                            if (originY == "center") transforms.push("translateY(-50%)");
+                            else if (originY == "bottom") transforms.push("translateY(-100%)");
+                        }
+
+                        if (e.position.rotation) {
+                            transforms.push(`rotate(${e.position.rotation}deg)`);
+                        }
+
+                        element.style.transform = transforms.join(" ");
+                    }
+
+                    WebFont.load({
+                        google: {
+                            families: [e.fontFamily]
+                        }
+                    });
+
+                    html.append(element);
                 }
 
                 // image

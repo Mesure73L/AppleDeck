@@ -19,6 +19,7 @@ All types of contributions are encouraged and valued. See the [Table of Contents
   - [Reporting Bugs](#reporting-bugs)
   - [Suggesting Enhancements](#suggesting-enhancements)
   - [Improving The Documentation](#improving-the-documentation)
+  - [Making Pull Requests](#making-pull-requests)
 - [Attribution](#attribution)
 
 ## Code of Conduct
@@ -120,6 +121,74 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/Mesure
 ### Improving The Documentation
 
 If you find any type of error in the [documentation](https://appledeck.gitbook.io/docs), you may [open an issue](https://github.com/Mesure73L/AppleDeck/issues/new?assignees=&labels=page%3A+documentation&projects=&template=documentation.md&title=%5BDOCUMENTATION%5D+) and describe your issue.
+
+### Making Pull Requests
+
+> [!IMPORTANT]
+> By making a pull request, your code will be put under the license of the AppleDeck repository, whether merged or not.
+
+If you have changes you would like to put into AppleDeck, you may create a pull request. **However, please create an issue and wait for approval before creating a pull request**, unless the pull request was approved elsewhere.
+
+#### How Do I Make Good Pull Requests?
+
+- Pull requests will typically be merged to the `develop` branch - please set the "compare" to that.
+- Describing the problem - please reference the issue that got approved with the changes. If there is no issue, please say where the changes were approved. **If you do not have an approval yet, try to get one before creating the pull request.**
+- Type of changes - This can be bug report, new feature, etc. If you got approval from an issue, this should be similar to the labels on that issue.
+- Describing the changes - in detail, provide descriptions for every change that you made. If something needs to be changed in the documentation, please say that here.
+- Describing the testing - please describe how this was tested, bugs that you checked for, etc.
+
+**Bad pull request:**
+```
+**What problem did you fix?**
+Added jQuery to fix kicking
+
+**What type of pull request are you making?**
+Bug fix
+
+**What changes were made?**
+I added jQuery
+
+**How was this tested?**
+It works
+```
+
+**Good pull request:**
+
+```
+**What problem did you fix?**
+I fixed the bug with users randomly being kicked, described in #4.
+
+**What type of pull request are you making?**
+This pull request is for a bug fix.
+
+**What changes were made?**
+ - Imported jQuery onto the user and spectator clients.
+ - Changed how users are kicked
+
+**How was this tested?**
+I tested all JavaScript that was changed to jQuery, kicking someone in the console client, kicking someone in the host client, and internet being disconnected.
+```
+
+#### Writing Good Commit Messages
+
+To write good commit messages, all you need to do is describe the change in a user-readable way. There is not any specific convention that AppleDeck uses, but as long as a human can read it. You do not need to worry about [Conventional Commits](https://www.conventionalcommits.org/) because there is no need for machines to read the commits.
+
+Things to keep in mind:
+ - One change per commit
+ - Short commit messages (if GitHub truncates it, it's too long)
+ - It should be quickly readable
+
+**Bad commit messages:**
+```
+ - Added jQuery to user and spec clients, fixed bug with users being randomly kicked, added better accessibility
+```
+
+**Good commit messages:**
+```
+ - Added jQuery to user and spec clients
+ - Fixed bug with users being randomly kicked
+ - Added alt text to image elements
+```
 
 ## Attribution
 

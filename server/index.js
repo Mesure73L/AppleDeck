@@ -23,7 +23,6 @@ const clntPort = 3000;
 const clntPrefix = "[CLNT] ";
 const joinPrefix = "[JOIN] ";
 const userPrefix = "[USER] ";
-const hostPrefix = "[HOST] ";
 const specPrefix = "[SPEC] ";
 const nodePrefix = "[NODE] ";
 
@@ -31,7 +30,6 @@ const nodePrefix = "[NODE] ";
 // changing this will require changing it in the html files too
 const joinNamespace = "/join";
 const userNamespace = "/user";
-const hostNamespace = "/host";
 const specNamespace = "/spec";
 const nodeNamespace = "/node";
 
@@ -51,7 +49,6 @@ const dir = __dirname.replace("server", "client");
 
 const join = io.of(joinNamespace);
 const user = io.of(userNamespace);
-const host = io.of(hostNamespace);
 const spec = io.of(specNamespace);
 const node = io.of(nodeNamespace);
 
@@ -83,7 +80,6 @@ let history = [];
 
 let joinConnected = 0;
 let userConnected = 0;
-let hostConnected = 0;
 let specConnected = 0;
 let nodeConnected = 0;
 
@@ -355,11 +351,10 @@ function executeCommand(command) {
         // session count
         if (cmd == "count") {
             let count =
-                joinConnected + userConnected + hostConnected + specConnected + nodeConnected;
+                joinConnected + userConnected + specConnected + nodeConnected;
             out("There are currently " + count + " total clients connected.");
             out(" - " + joinConnected + " join connections");
             out(" - " + userConnected + " user connections");
-            out(" - " + hostConnected + " host connections");
             out(" - " + specConnected + " spec connections");
             out(" - " + nodeConnected + " node connections");
             return;
@@ -590,13 +585,6 @@ function executeCommand(command) {
     out("Command not found");
 }
 
-function canHostExecute(command) {
-    if (devmode) return true;
-    const check = new RegExp(`^(${dangerousCommands.join("|")})`);
-    if (check.test(command)) return false;
-    return true;
-}
-
 // CLNT
 
 function cout(message) {
@@ -636,10 +624,6 @@ app.get("/", (req, res) => {
 
 app.get("/join-user", (req, res) => {
     res.sendFile(dir + "/join-user.html");
-});
-
-app.get("/join-host", (req, res) => {
-    res.sendFile(dir + "/join-host.html");
 });
 
 app.get("/join-spec", (req, res) => {
@@ -742,10 +726,6 @@ join.on("connect", socket => {
             });
         }
 
-        // host
-        else if (request.type == "host") {
-        }
-
         // node
         else if (request.type == "node") {
             const code = generateCode();
@@ -818,33 +798,6 @@ user.on("connect", socket => {
         if (input.length > 2048) return;
         if (inputs[input.id] == undefined) inputs[input.id] = {};
         inputs[input.id][username] = input.value == "" ? null : input.value;
-    });
-});
-
-// HOST
-
-function hout(message) {
-    out(hostPrefix + message);
-}
-
-app.get("/host", (req, res) => {
-    res.sendFile(dir + "/host.html");
-});
-
-host.on("connect", socket => {
-    hostConnected++;
-
-    socket.on("disconnect", () => {
-        hostConnected--;
-    });
-
-    // ---
-
-    host.on("command", command => {
-        log("host@AppleDeck $ " + command);
-
-        if (canHostExecute(command)) return executeCommand(command);
-        out("Command not found");
     });
 });
 

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AppleDeck Error</title>
+        <link rel="icon" type="image/x-png" href="logo" />
+        <style>
+            @import url("https://fonts.googleapis.com/css?family=Rubik Spray Paint|Righteous&display=swap");
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                width: 100dvh;
+                height: 100dvh;
+                overflow: hidden;
+                background: linear-gradient(to bottom left, #180b1e, #341842);
+            }
+
+            #main {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            h1 {
+                color: #9e49c8;
+                font-family: "Rubik Spray Paint", Roboto, Arial, sans-serif;
+                display: block;
+                text-align: center;
+                font-size: 50px;
+                font-weight: normal;
+            }
+
+            p {
+                font-family: Roboto, Arial, sans-serif;
+                font-size: 20px;
+                text-align: center;
+                color: #f96f5d;
+                margin-top: -15px;
+            }
+        </style>
+    </head>
+    <body>
+        <main id="main">
+            <h1>404 Not Found</h1>
+            <p>Cannot GET {{ path }}</p>
+        </main>
+    </body>
+</html>

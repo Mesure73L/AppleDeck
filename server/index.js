@@ -350,8 +350,7 @@ function executeCommand(command) {
 
         // session count
         if (cmd == "count") {
-            let count =
-                joinConnected + userConnected + specConnected + nodeConnected;
+            let count = joinConnected + userConnected + specConnected + nodeConnected;
             out("There are currently " + count + " total clients connected.");
             out(" - " + joinConnected + " join connections");
             out(" - " + userConnected + " user connections");
@@ -899,6 +898,18 @@ node.on("connect", socket => {
 });
 
 // START SERVERS
+
+app.get("*", (req, res) => {
+    const path = req.path;
+    fs.readFile(dir + "/404.html", "utf8", (err, data) => {
+        if (err) {
+            res.status(404).send("404 Not Found");
+            return;
+        }
+        const modifiedData = data.replace(/{{ path }}/g, path);
+        res.status(404).send(modifiedData);
+    });
+});
 
 server.listen(clntPort, () => {
     cout(`listening on *:${clntPort}`);

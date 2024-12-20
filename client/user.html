@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AppleDeck Presentation</title>
+        <link rel="icon" type="image/x-png" href="logo" />
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                margin: 0;
+                overflow: hidden;
+                height: 100vh;
+                width: 100vw;
+                background-color: #141414;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-family: Roboto, Arial, Helvetica, sans-serif;
+            }
+
+            #container {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+                background-color: #141414;
+                position: relative;
+            }
+
+            #slide {
+                width: 1920px;
+                height: 1080px;
+                background-color: white;
+                transform-origin: center;
+                overflow: hidden;
+                position: absolute;
+            }
+
+            #nav {
+                width: 125px;
+                height: 40px;
+                z-index: 100;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                color: white;
+                background-color: #545454;
+                line-height: 40px;
+                border-radius: 16px;
+                font-family: Roboto, Arial, Helvetica, sans-serif;
+                font-size: 18px;
+                text-align: center;
+                opacity: 1;
+                transition: opacity 0.3s ease;
+                position: fixed;
+            }
+
+            #nav::before {
+                content: "";
+                position: absolute;
+                top: -30px;
+                right: -25dvw;
+                bottom: -30px;
+                left: -25dvw;
+                z-index: -1;
+            }
+
+            #nav:hover {
+                opacity: 0.25;
+            }
+        </style>
+        <style id="slide-style"></style>
+        <link
+            href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark/dark.css"
+            rel="stylesheet" />
+    </head>
+    <body>
+        <div id="container">
+            <div id="slide"></div>
+        </div>
+        <div id="nav"><p id="currentslide">Slide ?/?</p></div>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/renderer"></script>
+        <script src="cookies"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+        <script src="/sweetalert"></script>
+        <script>
+            if (getCookie("user") == null) window.location.href = "../join-user";
+
+            const socket = io("/user", {
+                auth: {
+                    token: getCookie("user").token
+                }
+            });
+
+            socket.on("connect_error", err => {
+                window.location.href = "../join-user";
+            });
+
+            socket.on("kicked", () => {
+                setCookie("user", "", -1);
+                window.location.href = "../join-user";
+            });
+
+            let engine;
+            let slideshow;
+
+            let engineLoaded = false;
+            let slideLoaded = false;
+
+            const container = document.getElementById("container");
+            const slide = document.getElementById("slide");
+
+            function ajax(url) {
+                return new Promise(function (resolve, reject) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = function () {
+                        resolve(this.responseText);
+                    };
+                    xhr.onerror = reject;
+                    xhr.open("GET", url);
+                    xhr.send();
+                });
+            }
+
+            function resizeSlide() {
+                const containerWidth = container.clientWidth;
+                const containerHeight = container.clientHeight;
+
+                const targetAspectRatio = 1920 / 1080;
+                const containerAspectRatio = containerWidth / containerHeight;
+
+                let scale;
+
+                if (containerAspectRatio > targetAspectRatio) scale = containerHeight / 1080;
+                else scale = containerWidth / 1920;
+
+                slide.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                slide.style.position = "absolute";
+                slide.style.left = "50%";
+                slide.style.top = "50%";
+            }
+
+            ajax(`slideshow`)
+                .then(function (result) {
+                    engine = new RenderEngine(result, "user");
+                    engineLoaded = true;
+                    slideshow = engine.getSlideshow();
+                    resizeSlide();
+                    if (slideLoaded) {
+                        slide.append(engine.getSlide(slideLoaded));
+                        document.getElementById("currentslide").innerText = `Slide ${
+                            slideLoaded + 1
+                        }/${engine.getAllSlides().length}`;
+                    }
+                })
+                .catch(function (e) {
+                    alert(e);
+                });
+
+            socket.on("slide", s => {
+                slide.innerHTML = "";
+                slideLoaded = true;
+                if (engineLoaded) {
+                    slide.append(engine.getSlide(s));
+                    document.getElementById("currentslide").innerText = `Slide ${s + 1}/${
+                        engine.getAllSlides().length
+                    }`;
+                } else slideLoaded = s;
+            });
+
+            socket.on("slideshow updated", () => {
+                window.location.reload();
+            });
+
+            window.addEventListener("resize", resizeSlide);
+        </script>
+    </body>
+</html>

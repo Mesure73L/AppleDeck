@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AppleDeck Console</title>
+        <link rel="icon" type="image/x-png" href="logo" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            .console,
+            .output {
+                overflow-y: auto;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            .console::-webkit-scrollbar,
+            .output::-webkit-scrollbar {
+                display: none;
+            }
+
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                background-color: #1e1e1e;
+                font-family: monospace;
+                overflow: hidden;
+                font-size: 14px;
+                padding: 50px;
+            }
+
+            .console {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                height: 100%;
+                padding: 10px;
+                background-color: #141414;
+                color: #fff;
+            }
+
+            .console p {
+                margin: 0;
+                padding: 0;
+            }
+
+            .output {
+                flex: 1;
+                color: #ccc;
+            }
+
+            .input-container {
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                padding: 10px;
+            }
+
+            .cmd {
+                color: #66cc00;
+            }
+
+            .error {
+                color: #ff0000;
+            }
+
+            .prompt {
+                color: #999;
+            }
+
+            .clnt {
+                color: #00ffff;
+            }
+
+            .join {
+                color: #00bc00;
+            }
+
+            .user {
+                color: #00c3ff;
+            }
+
+            .host {
+                color: #ff6e6e;
+            }
+
+            .spec {
+                color: #ff70f1;
+            }
+
+            .node {
+                color: #ffc551;
+            }
+
+            .admin {
+                color: #b91515;
+            }
+
+            .input {
+                margin-left: 10px;
+                flex-grow: 1;
+                height: 20px;
+                padding: 0;
+                border: none;
+                border-radius: 0;
+                font-family: monospace;
+                font-size: 14px;
+                background-color: transparent;
+                color: #fff;
+                border-bottom: 1px solid #fff;
+            }
+
+            .input:focus {
+                outline: none;
+            }
+
+            .send-btn {
+                background-color: transparent;
+                color: lightblue;
+                border: none;
+                cursor: pointer;
+                margin-left: 10px;
+                font-size: 18px;
+                transition: color 0.3s;
+            }
+
+            .send-btn:hover {
+                color: #007bff;
+            }
+
+            .tooltip {
+                position: relative;
+                display: inline-block;
+            }
+
+            .tooltip .tooltiptext {
+                visibility: hidden;
+                width: 120px;
+                background-color: #555;
+                color: #fff;
+                text-align: center;
+                border-radius: 5px;
+                padding: 5px;
+                position: absolute;
+                z-index: 1;
+                bottom: 125%;
+                left: 50%;
+                transform: translateX(-50%);
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .tooltip:hover .tooltiptext {
+                visibility: visible;
+                opacity: 1;
+            }
+
+            .tooltip:hover .tooltiptext {
+                left: auto;
+                right: 0;
+                transform: translateX(0);
+            }
+        </style>
+    </head>
+    <body>
+        <main id="console" class="console" aria-live="polite">
+            <div id="output" class="output"></div>
+            <div class="input-container">
+                <label for="input" class="prompt">admin@AppleDeck $</label>
+                <input id="input" class="input" type="text" />
+                <div class="tooltip">
+                    <button id="sendBtn" class="send-btn" aria-label="Send Command" type="button">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                    <span class="tooltiptext">Send Command</span>
+                </div>
+            </div>
+        </main>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="cookies"></script>
+        <script>
+            if (getCookie("node") == null) window.location.href = "../join-node";
+
+            const socket = io("/node", {
+                auth: {
+                    token: getCookie("node").token
+                }
+            });
+
+            socket.on("connect_error", err => {
+                window.location.href = "../join-node";
+            });
+
+            const input = $("#input");
+            const output = $("#output");
+
+            function addLine(line) {
+                const element = $("<p>");
+                const typeElement = $("<span>");
+                const log = $("<span>");
+
+                const types = ["CLNT", "JOIN", "USER", "HOST", "SPEC", "NODE", "admin@appledeck"];
+                types.forEach(type => {
+                    const prefix = type === "admin@appledeck" ? "admin@AppleDeck $ " : `[${type}] `;
+                    if (line.startsWith(prefix)) {
+                        line = line.replace(prefix, "");
+                        typeElement.text(prefix);
+                        typeElement.addClass(
+                            type === "admin@appledeck" ? "admin" : type.toLowerCase()
+                        );
+                    }
+                });
+
+                log.text(line);
+
+                element.append(typeElement);
+                element.append(log);
+
+                const wasAtBottom =
+                    output.prop("scrollHeight") -
+                        output.prop("clientHeight") -
+                        output.prop("scrollTop") <
+                    2;
+
+                output.append(element);
+
+                if (wasAtBottom) {
+                    output.prop("scrollTop", output.prop("scrollHeight"));
+                }
+            }
+
+            socket.on("history", history => {
+                output.empty();
+                for (i = 0; i < history.length; i++) {
+                    addLine(history[i]);
+                }
+                output.scrollTop = output.scrollHeight;
+            });
+
+            socket.on("output", line => {
+                addLine(line);
+            });
+
+            input.keydown(e => {
+                if (e.key == "Enter" || e.keyCode == 13) {
+                    send();
+                }
+            });
+
+            $("#sendBtn").click(send);
+
+            function send() {
+                const command = input.val().trim();
+                if (command === "") {
+                    alert("Please enter a command.");
+                    return;
+                }
+                addLine("admin@AppleDeck $ " + command);
+                socket.emit("command", command);
+                input.val("");
+            }
+        </script>
+    </body>
+</html>
